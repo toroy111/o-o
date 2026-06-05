@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>焰麥手作烘焙</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+🔥焰麥手作烘焙🔥
+</div>
+
+<div class="subtitle">
+每日新鮮出爐
+</div>
+
+</header>
+
+<div class="container">
+
+<div class="products">
+
+<div class="card">
+
+<img src="images/bread1.jpg">
+
+<div class="card-body">
+
+<h3>鮮奶吐司</h3>
+
+<div class="price">
+$120
+</div>
+
+<button onclick="addCart('鮮奶吐司',120)">
+加入購物車
+</button>
+
+</div>
+</div>
+
+<div class="card">
+
+<img src="images/bread2.jpg">
+
+<div class="card-body">
+
+<h3>法國麵包</h3>
+
+<div class="price">
+$80
+</div>
+
+<button onclick="addCart('法國麵包',80)">
+加入購物車
+</button>
+
+</div>
+</div>
+
+</div>
+
+<div class="cart">
+
+<h2>購物車</h2>
+
+<div id="cartList"></div>
+
+<hr>
+
+姓名
+
+<input id="customer">
+
+<br><br>
+
+電話
+
+<input id="phone">
+
+<br><br>
+
+<button onclick="sendOrder()">
+送出訂單
+</button>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import {
+ db,
+ ref,
+ push
+}
+from "./firebase.js";
+
+let cart=[];
+
+window.addCart=function(name,price){
+
+ cart.push({
+  name,
+  price
+ });
+
+ renderCart();
+}
+
+function renderCart(){
+
+ let html='';
+
+ cart.forEach(item=>{
+
+  html+=`
+  <div>
+  ${item.name}
+  $${item.price}
+  </div>
+  `;
+ });
+
+ document.getElementById(
+ 'cartList'
+ ).innerHTML=html;
+}
+
+window.sendOrder=function(){
+
+ let customer=
+ document.getElementById(
+ 'customer'
+ ).value;
+
+ let phone=
+ document.getElementById(
+ 'phone'
+ ).value;
+
+ push(
+  ref(db,'orders'),
+  {
+   customer,
+   phone,
+   cart,
+   status:'新訂單',
+   createTime:
+   new Date().toISOString()
+  }
+ );
+
+ alert("訂單送出成功");
+
+ cart=[];
+
+ renderCart();
+}
+
+</script>
+
+</body>
+</html>

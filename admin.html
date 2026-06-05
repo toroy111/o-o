@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>訂單管理系統</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header>
+
+<h1>
+焰麥手作烘焙
+後台管理
+</h1>
+
+</header>
+
+<div class="container">
+
+<div id="orders"></div>
+
+</div>
+
+<script type="module">
+
+import {
+ db,
+ ref,
+ onValue,
+ update
+}
+from "./firebase.js";
+
+const ordersDiv=
+document.getElementById(
+'orders'
+);
+
+onValue(
+ ref(db,'orders'),
+ snapshot=>{
+
+  let html='';
+
+  snapshot.forEach(order=>{
+
+   let data=
+   order.val();
+
+   html+=`
+
+   <div class="card">
+
+   <div class="card-body">
+
+   <h3>
+   ${data.customer}
+   </h3>
+
+   <p>
+   ${data.phone}
+   </p>
+
+   <p>
+   ${data.status}
+   </p>
+
+   <button
+   onclick="
+   changeStatus(
+   '${order.key}'
+   )">
+
+   製作完成
+
+   </button>
+
+   </div>
+
+   </div>
+
+   `;
+  });
+
+  ordersDiv.innerHTML=html;
+ });
+
+window.changeStatus=
+function(key){
+
+ update(
+  ref(
+   db,
+   'orders/'+key
+  ),
+  {
+   status:'完成'
+  }
+ );
+}
+
+</script>
+
+</body>
+</html>
