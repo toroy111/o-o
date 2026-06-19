@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>暖麥時光 - 麵包管理後台</title>
+    <title>焰麥時光 - 麵包管理後台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <style>
         :root {
@@ -14,6 +15,7 @@
             --text-dark: #4a3c31;
             --border-color: #e5dfd5;
             --accent-orange: #d97706;
+            --danger-red: #dc2626;
             --sidebar-bg: #3c322a;
         }
 
@@ -26,9 +28,20 @@
         .sidebar-btn { padding: 12px 15px; background: transparent; border: none; border-radius: 6px; text-align: left; color: #a39589; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
         .sidebar-btn:hover, .sidebar-btn.active { background: rgba(255,255,255,0.05); color: #fff; }
 
-        .main-content { flex-grow: 1; padding: 40px; max-width: 1200px; overflow-y: auto; }
+        .main-content { flex-grow: 1; padding: 40px; max-width: 1400px; overflow-y: auto; }
         .page-title { font-size: 24px; font-weight: 500; margin-bottom: 25px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
         
+        .system-toolbar { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .toolbar-group { display: flex; flex-direction: column; gap: 8px; }
+        .toolbar-group label { font-size: 13px; font-weight: 700; color: #7c6e62; }
+        .btn-tool { padding: 10px 18px; border: none; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: opacity 0.2s; }
+        .btn-tool:hover { opacity: 0.9; }
+        
+        .btn-excel { background: #16a34a; color: white; }
+        .btn-refresh { background: #2563eb; color: white; }
+        .btn-delete-orders { background: #f97316; color: white; }
+        .btn-delete-products { background: var(--danger-red); color: white; }
+
         .admin-card { background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 25px; margin-bottom: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.01); }
         .admin-card h3 { font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-weight: 500; }
         
@@ -39,6 +52,12 @@
         .form-group input:focus, .form-group textarea:focus { border-color: var(--primary-amber); }
         .form-group textarea { resize: vertical; height: 42px; }
 
+        .file-upload-wrapper { display: flex; align-items: center; gap: 12px; }
+        .file-upload-btn { background: #e5dfd5; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s; border: 1px solid #ccc; }
+        .file-upload-btn:hover { background: #dcd5ca; }
+        .file-status-text { font-size: 13px; color: #8c6239; font-weight: 500; }
+        .image-preview-thumbnail { width: 42px; height: 42px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color); display: none; }
+
         .btn-add { padding: 12px 25px; background: var(--primary-amber); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s; }
         .btn-add:hover { background: #6f4e2d; }
 
@@ -48,22 +67,58 @@
         .item-row:last-child { border-bottom: none; }
         .stock-badge { font-size: 12px; background: #faf8f5; padding: 3px 8px; border-radius: 4px; color: #7c6e62; }
 
-        .admin-table { width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color); font-size: 14px; }
-        .admin-table th, .admin-table td { padding: 14px 18px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        .admin-table th { background: #faf8f5; color: #7c6e62; font-weight: 500; }
-        .order-items { line-height: 1.6; color: #555; margin-bottom: 4px; }
-        .price-text { color: var(--accent-orange); font-weight: 700; }
+        .admin-table { width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color); font-size: 14px; table-layout: fixed; }
+        .admin-table th { background: #faf8f5; color: #7c6e62; font-weight: 500; padding: 16px 15px; text-align: left; border-bottom: 2px solid var(--border-color); }
+        .admin-table td { padding: 16px 15px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        
+        .col-name { width: 110px; }
+        .col-phone { width: 130px; }
+        .col-date { width: 120px; }
+        .col-items { width: auto; }
+        .col-total { width: 160px; } 
+
+        .order-items-wrapper { display: flex; flex-direction: column; gap: 6px; }
+        .order-items { white-space: nowrap; color: #555; font-size: 13.5px; }
+        
+        .order-note-box { margin-top: 8px; padding: 6px 10px; background: #fdfbf7; border-left: 3px solid var(--primary-amber); border-radius: 0 4px 4px 0; font-size: 12.5px; color: #7c6e62; line-height: 1.4; }
+        
+        .price-text { color: var(--accent-orange); font-weight: 700; white-space: nowrap; font-size: 15px; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2><i class="fa-solid fa-cookie-bite"></i> 暖麥時光</h2>
+        <h2><i class="fa-solid fa-cookie-bite"></i> 焰麥時光</h2>
         <button class="sidebar-btn active"><i class="fa-solid fa-gears"></i> 後台管理中心</button>
     </div>
 
     <div class="main-content">
         <h1 class="page-title">麵包營運後台管理</h1>
+
+        <div class="system-toolbar">
+            <div class="toolbar-group" style="flex-grow: 1;">
+                <label><i class="fa-solid fa-file-invoice-dollar"></i> 營運數據分析與備份</label>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-tool btn-refresh" onclick="initBackend()">
+                        <i class="fa-solid fa-arrows-rotate"></i> 重新抓取資料
+                    </button>
+                    <button class="btn-tool btn-excel" onclick="exportToExcel()">
+                        <i class="fa-solid fa-file-excel"></i> 導出全部訂單為 Excel 檔
+                    </button>
+                </div>
+            </div>
+            <div class="toolbar-group">
+                <label><i class="fa-solid fa-triangle-exclamation"></i> 分流危險資料刪除控制</label>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-tool btn-delete-orders" onclick="deleteDataSelection('orders')">
+                        <i class="fa-solid fa-user-minus"></i> 1. 刪除所有顧客訂購資料
+                    </button>
+                    <button class="btn-tool btn-delete-products" onclick="deleteDataSelection('products')">
+                        <i class="fa-solid fa-box-archive"></i> 2. 刪除已上架麵包庫存資料
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <div class="admin-card">
             <h3><i class="fa-solid fa-plus"></i> 上架特定日期販售種類</h3>
@@ -87,8 +142,15 @@
             </div>
             <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
                 <div class="form-group">
-                    <label>商品圖片網址 (URL)</label>
-                    <input id="imgUrl" placeholder="請貼上圖片網址（可至網路圖庫複製連結）">
+                    <label>上架商品圖片 (支援自動智慧壓縮、手機相機與檔案)</label>
+                    <div class="file-upload-wrapper">
+                        <label for="imageFileInput" class="file-upload-btn">
+                            <i class="fa-solid fa-image"></i> 選擇圖片檔案
+                        </label>
+                        <input type="file" id="imageFileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
+                        <img id="previewThumb" class="image-preview-thumbnail">
+                        <span id="uploadStatusText" class="file-status-text">尚未選擇檔案</span>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>內容物說明與內文文字</label>
@@ -108,11 +170,11 @@
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th>訂購人姓名</th>
-                        <th>聯絡電話</th>
-                        <th>預訂取貨日期</th>
-                        <th>訂購項目與數量 (條列式)</th>
-                        <th>訂單總金額</th>
+                        <th class="col-name">訂購人姓名</th>
+                        <th class="col-phone">聯絡電話</th>
+                        <th class="col-date">預訂取貨日期</th>
+                        <th class="col-items">訂購項目與數量</th>
+                        <th class="col-total">訂單金額總計</th>
                     </tr>
                 </thead>
                 <tbody id="orders">
@@ -124,61 +186,196 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, update, get, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // ⚠️ 請在此處配置您的實際 Firebase Realtime Database 設定 ⚠️
         const firebaseConfig = {
-           apiKey: "AIzaSyAgeP2a6Z-TqJaZ5F0j_2UoXVQ_WE3sckw",
-  authDomain: "jaffff-34d02.firebaseapp.com",
-  databaseURL: "https://jaffff-34d02-default-rtdb.firebaseio.com",
-  projectId: "jaffff-34d02",
-  storageBucket: "jaffff-34d02.firebasestorage.app",
-  messagingSenderId: "332430248808",
-  appId: "1:332430248808:web:10a92f48234bf18ce664dd",
-  measurementId: "G-Z975D1EG21"
+            apiKey: "AIzaSyAgeP2a6Z-TqJaZ5F0j_2UoXVQ_WE3sckw",
+            authDomain: "jaffff-34d02.firebaseapp.com",
+            databaseURL: "https://jaffff-34d02-default-rtdb.firebaseio.com",
+            projectId: "jaffff-34d02",
+            storageBucket: "jaffff-34d02.firebasestorage.app",
+            messagingSenderId: "332430248808",
+            appId: "1:332430248808:web:10a92f48234bf18ce664dd",
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let globalProductsCache = {}; // 全域商品快取快照，用來幫訂單換算當時的單價
+        let globalProductsCache = {}; 
+        let globalOrdersCache = {}; 
+        let uploadedImageUrlString = ""; 
 
-        // 1. 儲存商品
+        window.initBackend = async function() {
+            await loadInventory(); 
+            await loadOrders();    
+        }
+
+        // 核心修正：加入 Canvas 前端智慧圖片壓縮技術
+        window.handleFileSelect = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const statusText = document.getElementById("uploadStatusText");
+            const previewThumb = document.getElementById("previewThumb");
+
+            statusText.innerText = "⏳ 正在智慧壓縮圖片中...";
+            statusText.style.color = "var(--accent-orange)";
+            previewThumb.style.display = "none";
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    // 設定最大寬度，等比例縮小圖片體積
+                    const maxWidth = 1024;
+                    let targetWidth = img.width;
+                    let targetHeight = img.height;
+
+                    if (img.width > maxWidth) {
+                        targetWidth = maxWidth;
+                        targetHeight = Math.round((img.height * maxWidth) / img.width);
+                    }
+
+                    // 繪製到畫布進行壓縮
+                    const canvas = document.createElement("canvas");
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+                    // 轉換成二進位小檔案 (品質設為 0.82 既清晰又極小)
+                    canvas.toBlob(async function(blob) {
+                        statusText.innerText = "⏳ 體積優化完成！正高速上傳圖床...";
+                        
+                        const apiKey = "4a946b5a2663ec9fb23d328df8df4335"; 
+                        const formData = new FormData();
+                        formData.append("image", blob, "compressed_bread.jpg");
+
+                        try {
+                            const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+                                method: "POST",
+                                body: formData
+                            });
+                            const result = await response.json();
+
+                            if (result.success) {
+                                uploadedImageUrlString = result.data.url; 
+                                statusText.innerText = "✅ 壓縮上傳成功！";
+                                statusText.style.color = "green";
+                                
+                                previewThumb.src = uploadedImageUrlString;
+                                previewThumb.style.display = "block";
+                            } else {
+                                throw new Error("圖床拒絕接收");
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            statusText.innerText = "❌ 上傳失敗，請稍後重試！";
+                            statusText.style.color = "var(--danger-red)";
+                            uploadedImageUrlString = "";
+                        }
+                    }, "image/jpeg", 0.82);
+                };
+            };
+        }
+
+        window.exportToExcel = function() {
+            if (!globalOrdersCache || Object.keys(globalOrdersCache).length === 0) {
+                alert("目前資料庫沒有任何顧客訂單資料，無法導出 Excel 檔！");
+                return;
+            }
+
+            const excelRows = [
+                ["預訂取貨日期", "訂購人姓名", "聯絡電話", "訂購麵包內容物明細", "顧客備註", "訂單總金額 (NT$)"]
+            ];
+
+            for (let key in globalOrdersCache) {
+                let order = globalOrdersCache[key];
+                let itemSummaryArray = [];
+                let orderTotalSum = 0;
+                let targetDate = order.date;
+                let orderNote = order.note ? order.note : "無";
+
+                for (let p in order.items) {
+                    let qty = order.items[p];
+                    let price = 0;
+                    if (globalProductsCache && globalProductsCache[targetDate] && globalProductsCache[targetDate][p]) {
+                        price = globalProductsCache[targetDate][p].price || 0;
+                    }
+                    orderTotalSum += (price * qty);
+                    itemSummaryArray.push(`${p} × ${qty}個`);
+                }
+
+                excelRows.push([
+                    targetDate,
+                    order.name,
+                    order.phone,
+                    itemSummaryArray.join(" ｜ "),
+                    orderNote,
+                    orderTotalSum
+                ]);
+            }
+
+            const worksheet = XLSX.utils.aoa_to_sheet(excelRows);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "預購訂單明細");
+
+            const dateTag = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(workbook, `焰麥時光_預購訂單總表_${dateTag}.xlsx`);
+        }
+
+        window.deleteDataSelection = async function(type) {
+            let title = type === 'orders' ? "「1. 所有顧客訂購的資料」" : "「2. 所有已上架的麵包庫存資料」";
+            const step1 = confirm(`⚠️ 核心警告：您確定要刪除 ${title} 嗎？`);
+            if (!step1) return;
+            try {
+                await remove(ref(db, type));
+                alert(`🗑️ 成功！已徹底清空資料庫內 ${title}。`);
+                initBackend(); 
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
         window.saveProduct = async function() {
             const date = document.getElementById("date").value;
             const product = document.getElementById("product").value.trim();
             const price = parseInt(document.getElementById("price").value) || 0;
             const qty = parseInt(document.getElementById("qty").value) || 0;
-            const imgUrl = document.getElementById("imgUrl").value.trim();
             const description = document.getElementById("description").value.trim();
 
             if (!date || !product || qty <= 0 || price <= 0) {
-                alert("請確認『日期、名稱、售價、數量』皆有正確填寫！");
+                alert("請確認『日期、名稱、售價、數量』皆有填寫！");
                 return;
             }
 
+            let finalImgUrl = uploadedImageUrlString ? uploadedImageUrlString : "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=300&q=80";
+
             await update(ref(db, "products/" + date), {
                 [product]: {
-                    total: qty,
-                    sold: 0,
-                    price: price,
-                    img: imgUrl ? imgUrl : "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=300&q=80",
+                    total: qty, sold: 0, price: price,
+                    img: finalImgUrl,
                     desc: description
                 }
             });
 
-            alert("🎉 新增商品成功，前台已同步開放預購！");
-            
+            alert("🎉 新增商品成功，前台同步！");
             document.getElementById("product").value = "";
             document.getElementById("price").value = "";
             document.getElementById("qty").value = "";
-            document.getElementById("imgUrl").value = "";
             document.getElementById("description").value = "";
+            
+            document.getElementById("imageFileInput").value = "";
+            document.getElementById("previewThumb").style.display = "none";
+            document.getElementById("uploadStatusText").innerText = "尚未選擇檔案";
+            document.getElementById("uploadStatusText").style.color = "var(--text-dark)";
+            uploadedImageUrlString = ""; 
 
             initBackend();
         }
 
-        // 2. 讀取並動態計算還有多少東西（剩餘庫存）
         async function loadInventory() {
             const snapshot = await get(ref(db, "products"));
             const data = snapshot.val();
@@ -193,7 +390,6 @@
             for (let date in data) {
                 html += `<div class="date-group">`;
                 html += `<h4><i class="fa-regular fa-calendar"></i> 排程日期：${date}</h4>`;
-                
                 for (let product in data[date]) {
                     let prod = data[date][product];
                     let remain = (prod.total || 0) - (prod.sold || 0);
@@ -203,14 +399,9 @@
 
                     html += `
                         <div class="item-row">
-                            <div>
-                                <b>${product}</b> <span class="price-text" style="font-size:13px; margin-left:8px;">NT$ ${price}</span>
-                                ${desc}
-                            </div>
+                            <div><b>${product}</b> <span class="price-text" style="font-size:13px; margin-left:8px;">NT$ ${price}</span>${desc}</div>
                             <div class="stock-badge">
-                                總產量: ${prod.total} 件 ｜ 
-                                已訂: <span style="color:var(--accent-orange); font-weight:700;">${prod.sold}</span> 件 ｜ 
-                                剩餘: <span style="color:${remain === 0 ? 'red' : 'green'}; font-weight:700;">${remain}</span> 件
+                                總產量: ${prod.total} 件 ｜ 已訂: <span style="color:var(--accent-orange); font-weight:700;">${prod.sold}</span> 件 ｜ 剩餘: <span style="color:${remain === 0 ? 'red' : 'green'}; font-weight:700;">${remain}</span> 件
                             </div>
                         </div>
                     `;
@@ -220,10 +411,10 @@
             document.getElementById("inventory").innerHTML = html;
         }
 
-        // 3. 讀取前台傳入的訂單並進行條列式展現與金額統計
         async function loadOrders() {
             const snapshot = await get(ref(db, "orders"));
             const data = snapshot.val();
+            globalOrdersCache = data || {}; 
             const tbody = document.getElementById("orders");
 
             if (!data) {
@@ -232,43 +423,71 @@
             }
 
             let html = "";
-            for (let key in data) {
-                let itemText = "";
-                let orderTotalSum = 0;
-                let targetDate = data[key].date;
 
-                // 條列式拼裝每一個購買品項與小計
+            for (let key in data) {
+                let itemTextHtml = "";
+                let orderTotalSum = 0;
+                let targetDate = data[key].date; 
+                let noteText = data[key].note ? data[key].note.trim() : ""; 
+
                 for (let p in data[key].items) {
                     let qty = data[key].items[p];
                     let price = 0;
                     
-                    // 從快取中抓取單價進行乘算
-                    if (globalProductsCache[targetDate] && globalProductsCache[targetDate][p]) {
-                        price = globalProductsCache[targetDate][p].price || 0;
-                    }
-                    
-                    let subtotal = price * qty;
-                    orderTotalSum += subtotal;
+                    let cleanDate = targetDate.trim();
+                    let cleanProdName = p.trim();
 
-                    itemText += `<div class="order-items">• <b>${p}</b> × ${qty} 個 <span style="color:#a39589; font-size:12px;">(單價: ${price} | 小計: NT$ ${subtotal})</span></div>`;
+                    if (globalProductsCache && globalProductsCache[cleanDate]) {
+                        if (globalProductsCache[cleanDate][cleanProdName]) {
+                            price = globalProductsCache[cleanDate][cleanProdName].price || 0;
+                        } else {
+                            for (let actualProdName in globalProductsCache[cleanDate]) {
+                                if (actualProdName.trim() === cleanProdName) {
+                                    price = globalProductsCache[cleanDate][actualProdName].price || 0;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (price === 0) {
+                        for (let anyDate in globalProductsCache) {
+                            if (globalProductsCache[anyDate][cleanProdName]) {
+                                price = globalProductsCache[anyDate][cleanProdName].price || 0;
+                                break;
+                            }
+                        }
+                    }
+
+                    orderTotalSum += (price * qty);
+                    itemTextHtml += `<div class="order-items">• <b>${p}</b> × ${qty} 個</div>`;
+                }
+
+                let noteHtml = "";
+                if (noteText) {
+                    noteHtml = `<div class="order-note-box"><i class="fa-solid fa-comment-dots" style="color:var(--primary-amber)"></i> <b>備註：</b>${noteText}</div>`;
+                } else {
+                    noteHtml = `<div class="order-note-box" style="color:#c1b5a9; border-left-color:#e5dfd5;"><i class="fa-regular fa-comment" style="color:#c1b5a9"></i> <i>無備註</i></div>`;
                 }
 
                 html += `
                     <tr>
                         <td><b>${data[key].name}</b></td>
                         <td>${data[key].phone}</td>
-                        <td><span style="background:#fff; border:1px solid var(--border-color); padding:3px 6px; border-radius:4px; font-size:13px;">${targetDate}</span></td>
-                        <td>${itemText}</td>
-                        <td><span class="price-text">NT$ ${orderTotalSum.toLocaleString()}</span></td>
+                        <td><span style="background:#fff; border:1px solid var(--border-color); padding:3px 6px; border-radius:4px; font-size:13px; white-space:nowrap;">${targetDate}</span></td>
+                        <td>
+                            <div class="order-items-wrapper">
+                                ${itemTextHtml}
+                                ${noteHtml}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="price-text">NT$ ${orderTotalSum.toLocaleString()}</span>
+                        </td>
                     </tr>
                 `;
             }
             tbody.innerHTML = html;
-        }
-
-        async function initBackend() {
-            await loadInventory(); // 建立庫存快照
-            await loadOrders();    // 依快照計算金額
         }
 
         initBackend();
