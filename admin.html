@@ -1,112 +1,277 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>暖麥時光 - 麵包管理後台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-<meta charset="UTF-8">
+    <style>
+        :root {
+            --primary-amber: #8c6239;
+            --light-bg: #fdfbf7;
+            --text-dark: #4a3c31;
+            --border-color: #e5dfd5;
+            --accent-orange: #d97706;
+            --sidebar-bg: #3c322a;
+        }
 
-<title>訂單管理系統</title>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; color: var(--text-dark); }
+        body { background-color: var(--light-bg); display: flex; min-height: 100vh; }
 
-<link rel="stylesheet" href="style.css">
+        .sidebar { width: 240px; background: var(--sidebar-bg); padding: 30px 20px; display: flex; flex-direction: column; gap: 10px; }
+        .sidebar h2 { color: #f3ede2; font-size: 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+        .sidebar h2 i { color: var(--accent-orange); }
+        .sidebar-btn { padding: 12px 15px; background: transparent; border: none; border-radius: 6px; text-align: left; color: #a39589; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+        .sidebar-btn:hover, .sidebar-btn.active { background: rgba(255,255,255,0.05); color: #fff; }
 
+        .main-content { flex-grow: 1; padding: 40px; max-width: 1200px; overflow-y: auto; }
+        .page-title { font-size: 24px; font-weight: 500; margin-bottom: 25px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
+        
+        .admin-card { background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 25px; margin-bottom: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.01); }
+        .admin-card h3 { font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 13px; font-weight: 500; color: #7c6e62; }
+        .form-group input, .form-group textarea { padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; outline: none; }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--primary-amber); }
+        .form-group textarea { resize: vertical; height: 42px; }
+
+        .btn-add { padding: 12px 25px; background: var(--primary-amber); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s; }
+        .btn-add:hover { background: #6f4e2d; }
+
+        .date-group { margin-bottom: 20px; background: white; border: 1px solid var(--border-color); border-radius: 6px; padding: 15px 20px; }
+        .date-group h4 { font-size: 15px; color: var(--primary-amber); border-bottom: 1px dashed var(--border-color); padding-bottom: 8px; margin-bottom: 10px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 14px; border-bottom: 1px solid #fafafa; }
+        .item-row:last-child { border-bottom: none; }
+        .stock-badge { font-size: 12px; background: #faf8f5; padding: 3px 8px; border-radius: 4px; color: #7c6e62; }
+
+        .admin-table { width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color); font-size: 14px; }
+        .admin-table th, .admin-table td { padding: 14px 18px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .admin-table th { background: #faf8f5; color: #7c6e62; font-weight: 500; }
+        .order-items { line-height: 1.6; color: #555; margin-bottom: 4px; }
+        .price-text { color: var(--accent-orange); font-weight: 700; }
+    </style>
 </head>
-
 <body>
 
-<header>
+    <div class="sidebar">
+        <h2><i class="fa-solid fa-cookie-bite"></i> 暖麥時光</h2>
+        <button class="sidebar-btn active"><i class="fa-solid fa-gears"></i> 後台管理中心</button>
+    </div>
 
-<h1>
-焰麥手作烘焙
-後台管理
-</h1>
+    <div class="main-content">
+        <h1 class="page-title">麵包營運後台管理</h1>
 
-</header>
+        <div class="admin-card">
+            <h3><i class="fa-solid fa-plus"></i> 上架特定日期販售種類</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>販售日期</label>
+                    <input id="date" type="date">
+                </div>
+                <div class="form-group">
+                    <label>麵包名稱</label>
+                    <input id="product" placeholder="例如：法式經典牛角包">
+                </div>
+                <div class="form-group">
+                    <label>單個售價 (NT$)</label>
+                    <input id="price" type="number" min="0" placeholder="例如：18">
+                </div>
+                <div class="form-group">
+                    <label>準備生產總量</label>
+                    <input id="qty" type="number" min="1" placeholder="例如：50">
+                </div>
+            </div>
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="form-group">
+                    <label>商品圖片網址 (URL)</label>
+                    <input id="imgUrl" placeholder="請貼上圖片網址（可至網路圖庫複製連結）">
+                </div>
+                <div class="form-group">
+                    <label>內容物說明與內文文字</label>
+                    <textarea id="description" placeholder="請輸入內容物成分、口感描述等介紹文字..."></textarea>
+                </div>
+            </div>
+            <button class="btn-add" onclick="saveProduct()"><i class="fa-solid fa-cloud-arrow-up"></i> 發布商品至前台</button>
+        </div>
 
-<div class="container">
+        <div class="admin-card">
+            <h3><i class="fa-solid fa-boxes-stacked"></i> 當前上架販售明細與剩餘庫存同步計算</h3>
+            <div id="inventory">載入中...</div>
+        </div>
 
-<div id="orders"></div>
+        <div class="admin-card">
+            <h3><i class="fa-solid fa-list-check"></i> 顧客預購訂單明細與金額總計</h3>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>訂購人姓名</th>
+                        <th>聯絡電話</th>
+                        <th>預訂取貨日期</th>
+                        <th>訂購項目與數量 (條列式)</th>
+                        <th>訂單總金額</th>
+                    </tr>
+                </thead>
+                <tbody id="orders">
+                    <tr><td colspan="5" style="text-align: center; color: #9c8e82;">尚無任何預購訂單資料</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-</div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-<script type="module">
+        // ⚠️ 請在此處配置您的實際 Firebase Realtime Database 設定 ⚠️
+        const firebaseConfig = {
+           apiKey: "AIzaSyAgeP2a6Z-TqJaZ5F0j_2UoXVQ_WE3sckw",
+  authDomain: "jaffff-34d02.firebaseapp.com",
+  databaseURL: "https://jaffff-34d02-default-rtdb.firebaseio.com",
+  projectId: "jaffff-34d02",
+  storageBucket: "jaffff-34d02.firebasestorage.app",
+  messagingSenderId: "332430248808",
+  appId: "1:332430248808:web:10a92f48234bf18ce664dd",
+  measurementId: "G-Z975D1EG21"
+        };
 
-import {
- db,
- ref,
- onValue,
- update
-}
-from "./firebase.js";
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-const ordersDiv=
-document.getElementById(
-'orders'
-);
+        let globalProductsCache = {}; // 全域商品快取快照，用來幫訂單換算當時的單價
 
-onValue(
- ref(db,'orders'),
- snapshot=>{
+        // 1. 儲存商品
+        window.saveProduct = async function() {
+            const date = document.getElementById("date").value;
+            const product = document.getElementById("product").value.trim();
+            const price = parseInt(document.getElementById("price").value) || 0;
+            const qty = parseInt(document.getElementById("qty").value) || 0;
+            const imgUrl = document.getElementById("imgUrl").value.trim();
+            const description = document.getElementById("description").value.trim();
 
-  let html='';
+            if (!date || !product || qty <= 0 || price <= 0) {
+                alert("請確認『日期、名稱、售價、數量』皆有正確填寫！");
+                return;
+            }
 
-  snapshot.forEach(order=>{
+            await update(ref(db, "products/" + date), {
+                [product]: {
+                    total: qty,
+                    sold: 0,
+                    price: price,
+                    img: imgUrl ? imgUrl : "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=300&q=80",
+                    desc: description
+                }
+            });
 
-   let data=
-   order.val();
+            alert("🎉 新增商品成功，前台已同步開放預購！");
+            
+            document.getElementById("product").value = "";
+            document.getElementById("price").value = "";
+            document.getElementById("qty").value = "";
+            document.getElementById("imgUrl").value = "";
+            document.getElementById("description").value = "";
 
-   html+=`
+            initBackend();
+        }
 
-   <div class="card">
+        // 2. 讀取並動態計算還有多少東西（剩餘庫存）
+        async function loadInventory() {
+            const snapshot = await get(ref(db, "products"));
+            const data = snapshot.val();
+            globalProductsCache = data || {}; 
 
-   <div class="card-body">
+            if (!data) {
+                document.getElementById("inventory").innerHTML = "<p style='color: #9c8e82;'>目前尚無任何上架商品規劃。</p>";
+                return;
+            }
 
-   <h3>
-   ${data.customer}
-   </h3>
+            let html = "";
+            for (let date in data) {
+                html += `<div class="date-group">`;
+                html += `<h4><i class="fa-regular fa-calendar"></i> 排程日期：${date}</h4>`;
+                
+                for (let product in data[date]) {
+                    let prod = data[date][product];
+                    let remain = (prod.total || 0) - (prod.sold || 0);
+                    if (remain < 0) remain = 0;
+                    let price = prod.price || 0;
+                    let desc = prod.desc ? ` <small style="color:#a39589;">(${prod.desc})</small>` : "";
 
-   <p>
-   ${data.phone}
-   </p>
+                    html += `
+                        <div class="item-row">
+                            <div>
+                                <b>${product}</b> <span class="price-text" style="font-size:13px; margin-left:8px;">NT$ ${price}</span>
+                                ${desc}
+                            </div>
+                            <div class="stock-badge">
+                                總產量: ${prod.total} 件 ｜ 
+                                已訂: <span style="color:var(--accent-orange); font-weight:700;">${prod.sold}</span> 件 ｜ 
+                                剩餘: <span style="color:${remain === 0 ? 'red' : 'green'}; font-weight:700;">${remain}</span> 件
+                            </div>
+                        </div>
+                    `;
+                }
+                html += `</div>`;
+            }
+            document.getElementById("inventory").innerHTML = html;
+        }
 
-   <p>
-   ${data.status}
-   </p>
+        // 3. 讀取前台傳入的訂單並進行條列式展現與金額統計
+        async function loadOrders() {
+            const snapshot = await get(ref(db, "orders"));
+            const data = snapshot.val();
+            const tbody = document.getElementById("orders");
 
-   <button
-   onclick="
-   changeStatus(
-   '${order.key}'
-   )">
+            if (!data) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #9c8e82;">尚無任何預購訂單資料</td></tr>`;
+                return;
+            }
 
-   製作完成
+            let html = "";
+            for (let key in data) {
+                let itemText = "";
+                let orderTotalSum = 0;
+                let targetDate = data[key].date;
 
-   </button>
+                // 條列式拼裝每一個購買品項與小計
+                for (let p in data[key].items) {
+                    let qty = data[key].items[p];
+                    let price = 0;
+                    
+                    // 從快取中抓取單價進行乘算
+                    if (globalProductsCache[targetDate] && globalProductsCache[targetDate][p]) {
+                        price = globalProductsCache[targetDate][p].price || 0;
+                    }
+                    
+                    let subtotal = price * qty;
+                    orderTotalSum += subtotal;
 
-   </div>
+                    itemText += `<div class="order-items">• <b>${p}</b> × ${qty} 個 <span style="color:#a39589; font-size:12px;">(單價: ${price} | 小計: NT$ ${subtotal})</span></div>`;
+                }
 
-   </div>
+                html += `
+                    <tr>
+                        <td><b>${data[key].name}</b></td>
+                        <td>${data[key].phone}</td>
+                        <td><span style="background:#fff; border:1px solid var(--border-color); padding:3px 6px; border-radius:4px; font-size:13px;">${targetDate}</span></td>
+                        <td>${itemText}</td>
+                        <td><span class="price-text">NT$ ${orderTotalSum.toLocaleString()}</span></td>
+                    </tr>
+                `;
+            }
+            tbody.innerHTML = html;
+        }
 
-   `;
-  });
+        async function initBackend() {
+            await loadInventory(); // 建立庫存快照
+            await loadOrders();    // 依快照計算金額
+        }
 
-  ordersDiv.innerHTML=html;
- });
-
-window.changeStatus=
-function(key){
-
- update(
-  ref(
-   db,
-   'orders/'+key
-  ),
-  {
-   status:'完成'
-  }
- );
-}
-
-</script>
-
+        initBackend();
+    </script>
 </body>
 </html>
