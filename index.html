@@ -52,7 +52,7 @@
         .form-group input, .form-group select { padding: 10px; border: 1px solid #e5dfd5; border-radius: 4px; background: #fff; font-size: 14px; outline: none; }
         .form-group input:focus, .form-group select:focus { border-color: var(--primary-amber); }
 
-        /* --- 人氣推薦商品區域 (Grid Layout) --- */
+        /* --- 商品區域 (Grid Layout) --- */
         .section-title { text-align: center; margin: 50px 0 30px; }
         .section-title h2 { font-size: 26px; font-weight: 500; margin-bottom: 5px; }
         .section-title p { font-size: 13px; color: #9c8e82; }
@@ -62,9 +62,10 @@
         .product-card:hover { transform: translateY(-4px); box-shadow: 0 6px 15px rgba(140,98,57,0.08); }
         .product-img { width: 100%; height: 200px; object-fit: cover; background: #f5f5f5; }
         .product-body { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
-        .product-name { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
-        .product-stock-info { font-size: 12px; color: #9c8e82; margin-bottom: 12px; line-height: 1.5; }
-        .product-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+        .product-name { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+        .product-desc { font-size: 13px; color: #7c6e62; margin-bottom: 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-stock-info { font-size: 12px; color: #9c8e82; margin-bottom: 12px; line-height: 1.5; margin-top: auto; }
+        .product-footer { display: flex; justify-content: space-between; align-items: center; }
         .product-price { font-size: 16px; font-weight: 700; color: var(--accent-orange); }
         .product-price::before { content: "NT$ "; font-size: 12px; }
 
@@ -86,7 +87,6 @@
         .btn-submit { padding: 12px 35px; background: var(--primary-amber); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 15px; font-weight: 500; transition: background 0.2s; }
         .btn-submit:hover { background: #6f4e2d; }
 
-        /* --- 網頁頁尾 Footer --- */
         footer { background: #3c322a; padding: 40px 5%; text-align: center; border-top: 1px solid #2e2620; }
         footer p { color: #a39589; font-size: 12px; line-height: 1.8; }
     </style>
@@ -128,8 +128,8 @@
 
     <section id="products-section">
         <div class="section-title">
-            <h2>人氣推薦</h2>
-            <p>最受歡迎的經典熟食風味</p>
+            <h2>今日開放預購種類</h2>
+            <p>嚴選新鮮食材，當日現做限量供應</p>
         </div>
         <div class="products-grid" id="products"></div>
     </section>
@@ -165,9 +165,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, get, push, set, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // ⚠️ 請在此處配置您的實際 Firebase Realtime Database 金鑰與設定 ⚠️
+        // ⚠️ 請在此處配置您的實際 Firebase Realtime Database 設定 ⚠️
         const firebaseConfig = {
-            apiKey: "AIzaSyAgeP2a6Z-TqJaZ5F0j_2UoXVQ_WE3sckw",
+           apiKey: "AIzaSyAgeP2a6Z-TqJaZ5F0j_2UoXVQ_WE3sckw",
   authDomain: "jaffff-34d02.firebaseapp.com",
   databaseURL: "https://jaffff-34d02-default-rtdb.firebaseio.com",
   projectId: "jaffff-34d02",
@@ -180,11 +180,201 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // 全域快取當前選取日期底下的所有後台商品原始資料
-        let currentMonthProductsRaw = {};
+        let currentProductsRaw = {}; // 存放當前日期底下的麵包物件資料
+        let cart = {}; // 快取購物車狀態 { 麵包名稱: 數量 }
 
-        loadDates();
-
-        // 1. 載入資料庫內現有開放的取貨日期列表
+        // 1. 自動從資料庫獲取所有有排程的日期，載入下拉選單
         async function loadDates() {
             const snapshot = await get(ref(db, "products"));
+            const data = snapshot.val();
+            const select = document.getElementById("dateSelect");
+            
+            if (!data) {
+                select.innerHTML = "<option value=''>目前無任何開放日期</option>";
+                document.getElementById("products").innerHTML = "<p style='grid-column:1/-1; text-align:center; color:#9c8e82;'>烘焙師正在加緊排程中，敬請期待！</p>";
+                return;
+            }
+
+            let sortedDates = Object.keys(data).sort();
+            select.innerHTML = sortedDates.map(date => `<option value="${date}">${date}</option>`).join('');
+            
+            // 監聽日期更換
+            select.addEventListener("change", () => loadProducts(select.value));
+            // 預設加載第一個日期的商品
+            loadProducts(sortedDates[0]);
+        }
+
+        // 2. 根據所選日期，將後台發布的資料撈出並渲染到前台
+        async function loadProducts(date) {
+            if (!date) return;
+            cart = {}; // 更換日期，清空購物車
+            updateCartDisplay();
+
+            const snapshot = await get(ref(db, "products/" + date));
+            const data = snapshot.val() || {};
+            currentProductsRaw = data;
+
+            const productsContainer = document.getElementById("products");
+            if (Object.keys(data).length === 0) {
+                productsContainer.innerHTML = "<p style='grid-column:1/-1; text-align:center; color:#9c8e82;'>此日期目前無販售種類。</p>";
+                return;
+            }
+
+            let html = "";
+            for (let product in data) {
+                let info = data[product];
+                let remain = (info.total || 0) - (info.sold || 0);
+                if (remain < 0) remain = 0;
+
+                html += `
+                    <div class="product-card">
+                        <img class="product-img" src="${info.img || 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=300&q=80'}" alt="${product}">
+                        <div class="product-body">
+                            <h3 class="product-name">${product}</h3>
+                            <p class="product-desc">${info.desc || '無內容物說明'}</p>
+                            <p class="product-stock-info">
+                                限量：${info.total} 件<br>
+                                剩餘：<span style="color:${remain === 0 ? 'red' : 'var(--primary-amber)'}; font-weight:700;">${remain}</span> 件
+                            </p>
+                            <div class="product-footer">
+                                <span class="product-price">${info.price || 0}</span>
+                                ${remain > 0 ? `
+                                    <div class="qty-controller">
+                                        <button class="qty-btn" onclick="changeQty('${product}', -1)">-</button>
+                                        <input class="qty-input" id="qty_${product}" value="0" readonly>
+                                        <button class="qty-btn" onclick="changeQty('${product}', 1)">+</button>
+                                    </div>
+                                ` : `<span style="color:red; font-size:13px; font-weight:500;">已售罄</span>`}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            productsContainer.innerHTML = html;
+        }
+
+        // 3. 處理加減鈕邏輯
+        window.changeQty = function(product, delta) {
+            let input = document.getElementById("qty_" + product);
+            let currentQty = parseInt(input.value) || 0;
+            let targetQty = currentQty + delta;
+
+            let info = currentProductsRaw[product];
+            let remain = (info.total || 0) - (info.sold || 0);
+
+            if (targetQty < 0) targetQty = 0;
+            if (targetQty > remain) {
+                alert(`非常抱歉！庫存僅剩 ${remain} 個，無法再增加了。`);
+                targetQty = remain;
+            }
+
+            input.value = targetQty;
+            if (targetQty > 0) {
+                cart[product] = targetQty;
+            } else {
+                delete cart[product];
+            }
+            updateCartDisplay();
+        }
+
+        // 4. 更新下方的「我的預購明細」與計算總金額
+        function updateCartDisplay() {
+            const tbody = document.getElementById("cart-items-tbody");
+            let grandTotal = 0;
+
+            if (Object.keys(cart).length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #9c8e82;">請在上方增減選購數量項目</td></tr>`;
+                document.getElementById("grand-total-display").innerText = "NT$ 0";
+                return;
+            }
+
+            let html = "";
+            for (let product in cart) {
+                let qty = cart[product];
+                let price = currentProductsRaw[product]?.price || 0;
+                let subtotal = price * qty;
+                grandTotal += subtotal;
+
+                html += `
+                    <tr>
+                        <td><b>${product}</b></td>
+                        <td>NT$ ${price}</td>
+                        <td>${qty} 個</td>
+                        <td style="color:var(--accent-orange); font-weight:700;">NT$ ${subtotal}</td>
+                    </tr>
+                `;
+            }
+            tbody.innerHTML = html;
+            document.getElementById("grand-total-display").innerText = "NT$ " + grandTotal.toLocaleString();
+        }
+
+        // 5. 送出訂單（利用交易安全扣庫存，並將數據寫入後台看得見的 orders）
+        window.submitOrder = async function() {
+            let name = document.getElementById("name").value.trim();
+            let phone = document.getElementById("phone").value.trim();
+            let date = document.getElementById("dateSelect").value;
+
+            if (!name || !phone) {
+                alert("請填寫訂購人真實姓名與聯絡電話！");
+                return;
+            }
+            if (Object.keys(cart).length === 0) {
+                alert("購物車內目前沒有任何品項，請先選購麵包。");
+                return;
+            }
+
+            // 使用 Transaction 確保多人在線扣減時，庫存資料百分之百正確
+            try {
+                let isStockOk = true;
+                const productRef = ref(db, "products/" + date);
+
+                await runTransaction(productRef, (currentProducts) => {
+                    if (currentProducts) {
+                        for (let p in cart) {
+                            let requestedQty = cart[p];
+                            let remain = currentProducts[p].total - currentProducts[p].sold;
+                            if (requestedQty > remain) {
+                                isStockOk = false;
+                                return; // 中斷交易
+                            }
+                        }
+                        // 如果庫存足夠，執行真實扣減（sold增加）
+                        for (let p in cart) {
+                            currentProducts[p].sold += cart[p];
+                        }
+                    }
+                    return currentProducts;
+                });
+
+                if (!isStockOk) {
+                    alert("剛剛有其他顧客搶先一步下單，部分商品剩餘庫存不足，請重新調整數量！");
+                    loadProducts(date);
+                    return;
+                }
+
+                // 寫入訂單節點，讓後台抓取條列
+                const orderRef = ref(db, "orders");
+                const newOrderRef = push(orderRef);
+                await set(newOrderRef, {
+                    name: name,
+                    phone: phone,
+                    date: date,
+                    items: cart
+                });
+
+                alert("🎉 恭喜您！預購訂單已成功送出，我們會為您保留麵包！");
+                document.getElementById("name").value = "";
+                document.getElementById("phone").value = "";
+                cart = {};
+                loadProducts(date);
+
+            } catch (err) {
+                console.error(err);
+                alert("下單失敗，請稍後再試。");
+            }
+        }
+
+        loadDates();
+    </script>
+</body>
+</html>
