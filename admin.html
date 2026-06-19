@@ -16,24 +16,42 @@
             --border-color: #e5dfd5;
             --accent-orange: #d97706;
             --danger-red: #dc2626;
-            --sidebar-bg: #3c322a;
+            --header-bg: #3c322a;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; color: var(--text-dark); }
-        body { background-color: var(--light-bg); display: flex; min-height: 100vh; }
+        body { background-color: var(--light-bg); display: flex; flex-direction: column; min-height: 100vh; }
 
-        .sidebar { width: 240px; background: var(--sidebar-bg); padding: 30px 20px; display: flex; flex-direction: column; gap: 10px; }
-        .sidebar h2 { color: #f3ede2; font-size: 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-        .sidebar h2 i { color: var(--accent-orange); }
-        .sidebar-btn { padding: 12px 15px; background: transparent; border: none; border-radius: 6px; text-align: left; color: #a39589; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
-        .sidebar-btn:hover, .sidebar-btn.active { background: rgba(255,255,255,0.05); color: #fff; }
+        /* 🌟 調整：將左側 Sidebar 改為置頂上方 Header */
+        header { 
+            background: var(--header-bg); 
+            padding: 15px 5%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        header h2 { color: #f3ede2; font-size: 20px; display: flex; align-items: center; gap: 8px; }
+        header h2 i { color: var(--accent-orange); }
+        .header-btn { padding: 10px 18px; background: rgba(255,255,255,0.08); border: none; border-radius: 6px; text-align: left; color: #fff; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 500; }
 
-        .main-content { flex-grow: 1; padding: 40px; max-width: 1400px; overflow-y: auto; }
+        /* 🌟 調整：主區塊填滿寬度，並設定響應式內邊距 */
+        .main-content { flex-grow: 1; padding: 25px 5%; max-width: 1400px; margin: 0 auto; width: 100%; }
         .page-title { font-size: 24px; font-weight: 500; margin-bottom: 25px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
         
-        .system-toolbar { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
-        .toolbar-group { display: flex; flex-direction: column; gap: 8px; }
+        /* 工具列響應式調整 */
+        .system-toolbar { display: flex; flex-direction: column; gap: 20px; margin-bottom: 30px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+        @media (min-width: 768px) {
+            .system-toolbar { flex-direction: row; justify-content: space-between; align-items: center; }
+        }
+        
+        .toolbar-group { display: flex; flex-direction: column; gap: 8px; width: 100%; }
         .toolbar-group label { font-size: 13px; font-weight: 700; color: #7c6e62; }
+        .toolbar-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+        
         .btn-tool { padding: 10px 18px; border: none; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: opacity 0.2s; }
         .btn-tool:hover { opacity: 0.9; }
         
@@ -42,70 +60,81 @@
         .btn-delete-orders { background: #f97316; color: white; }
         .btn-delete-products { background: var(--danger-red); color: white; }
 
-        .admin-card { background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 25px; margin-bottom: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.01); }
+        .admin-card { background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.01); }
+        @media (min-width: 768px) { .admin-card { padding: 25px; } }
         .admin-card h3 { font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-weight: 500; }
         
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        /* 網格響應式彈性排版 */
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; }
+        @media (min-width: 576px) { .form-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 992px) { .form-grid { grid-template-columns: repeat(4, 1fr); } }
+        
+        .form-group { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         .form-group label { font-size: 13px; font-weight: 500; color: #7c6e62; }
-        .form-group input, .form-group textarea { padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; outline: none; }
+        .form-group input, .form-group textarea { padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; outline: none; width: 100%; }
         .form-group input:focus, .form-group textarea:focus { border-color: var(--primary-amber); }
         .form-group textarea { resize: vertical; height: 42px; }
 
-        .file-upload-wrapper { display: flex; align-items: center; gap: 12px; }
-        .file-upload-btn { background: #e5dfd5; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s; border: 1px solid #ccc; }
+        /* 上傳圖片區塊的手機優化排版 */
+        .file-upload-wrapper { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+        .file-upload-btn { background: #e5dfd5; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s; border: 1px solid #ccc; white-space: nowrap; }
         .file-upload-btn:hover { background: #dcd5ca; }
-        .file-status-text { font-size: 13px; color: #8c6239; font-weight: 500; }
+        .file-status-text { font-size: 13px; color: #8c6239; font-weight: 500; word-break: break-all; }
         .image-preview-thumbnail { width: 42px; height: 42px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color); display: none; }
 
-        .btn-add { padding: 12px 25px; background: var(--primary-amber); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s; }
-        .btn-add:hover { background: #6f4e2d; }
+        .btn-add { padding: 12px 25px; background: var(--primary-amber); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s; width: 100%; justify-content: center; }
+        @media (min-width: 576px) { .btn-add { width: auto; } }
 
-        .date-group { margin-bottom: 20px; background: white; border: 1px solid var(--border-color); border-radius: 6px; padding: 15px 20px; }
+        .date-group { margin-bottom: 20px; background: white; border: 1px solid var(--border-color); border-radius: 6px; padding: 15px 15px; }
+        @media (min-width: 768px) { .date-group { padding: 15px 20px; } }
         .date-group h4 { font-size: 15px; color: var(--primary-amber); border-bottom: 1px dashed var(--border-color); padding-bottom: 8px; margin-bottom: 10px; }
         
-        /* 每一行麵包品項改用 flex 排版，讓右側對齊按鈕 */
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-size: 14px; border-bottom: 1px solid #fafafa; gap: 15px; }
-        .item-row:last-child { border-bottom: none; }
-        .item-info { flex-grow: 1; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-        .stock-badge { font-size: 12px; background: #faf8f5; padding: 4px 10px; border-radius: 4px; color: #7c6e62; white-space: nowrap; }
+        /* 麵包庫存排版彈性優化 */
+        .item-row { display: flex; flex-direction: column; justify-content: space-between; padding: 12px 0; font-size: 14px; border-bottom: 1px solid #fafafa; gap: 12px; }
+        @media (min-width: 768px) { .item-row { flex-direction: row; align-items: center; gap: 15px; } }
         
-        /* 🌟 單項刪除小按鈕樣式 */
-        .btn-delete-single { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .item-info { flex-grow: 1; display: flex; flex-direction: column; gap: 8px; width: 100%; }
+        @media (min-width: 576px) { .item-info { flex-direction: row; justify-content: space-between; align-items: center; } }
+        
+        .stock-badge { font-size: 12px; background: #faf8f5; padding: 4px 10px; border-radius: 4px; color: #7c6e62; white-space: nowrap; width: fit-content; }
+        
+        .btn-delete-single { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; width: fit-content; }
         .btn-delete-single:hover { background: #fca5a5; color: #b91c1c; }
 
-        .admin-table { width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color); font-size: 14px; table-layout: fixed; }
-        .admin-table th { background: #faf8f5; color: #7c6e62; font-weight: 500; padding: 16px 15px; text-align: left; border-bottom: 2px solid var(--border-color); }
-        .admin-table td { padding: 16px 15px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        /* 🌟 調整：表格外包覆滾動條容器，防止手機版變形爆版 */
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border-color); border-radius: 6px; }
+        .admin-table { width: 100%; border-collapse: collapse; background: white; font-size: 14px; min-width: 800px; }
+        .admin-table th { background: #faf8f5; color: #7c6e62; font-weight: 500; padding: 14px 12px; text-align: left; border-bottom: 2px solid var(--border-color); }
+        .admin-table td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
         
         .col-name { width: 110px; }
         .col-phone { width: 130px; }
         .col-date { width: 120px; }
         .col-items { width: auto; }
-        .col-total { width: 160px; } 
+        .col-total { width: 140px; } 
 
         .order-items-wrapper { display: flex; flex-direction: column; gap: 6px; }
         .order-items { white-space: nowrap; color: #555; font-size: 13.5px; }
         
-        .order-note-box { margin-top: 8px; padding: 6px 10px; background: #fdfbf7; border-left: 3px solid var(--primary-amber); border-radius: 0 4px 4px 0; font-size: 12.5px; color: #7c6e62; line-height: 1.4; }
+        .order-note-box { margin-top: 8px; padding: 6px 10px; background: #fdfbf7; border-left: 3px solid var(--primary-amber); border-radius: 0 4px 4px 0; font-size: 12.5px; color: #7c6e62; line-height: 1.4; white-space: normal; word-break: break-all; }
         
         .price-text { color: var(--accent-orange); font-weight: 700; white-space: nowrap; font-size: 15px; }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
+    <header>
         <h2><i class="fa-solid fa-cookie-bite"></i> 焰麥時光</h2>
-        <button class="sidebar-btn active"><i class="fa-solid fa-gears"></i> 後台管理中心</button>
-    </div>
+        <button class="header-btn"><i class="fa-solid fa-gears"></i> 後台管理中心</button>
+    </header>
 
     <div class="main-content">
         <h1 class="page-title">麵包營運後台管理</h1>
 
         <div class="system-toolbar">
-            <div class="toolbar-group" style="flex-grow: 1;">
+            <div class="toolbar-group">
                 <label><i class="fa-solid fa-file-invoice-dollar"></i> 營運數據分析與備份</label>
-                <div style="display: flex; gap: 10px;">
+                <div class="toolbar-buttons">
                     <button class="btn-tool btn-refresh" onclick="initBackend()">
                         <i class="fa-solid fa-arrows-rotate"></i> 重新抓取資料
                     </button>
@@ -116,7 +145,7 @@
             </div>
             <div class="toolbar-group">
                 <label><i class="fa-solid fa-triangle-exclamation"></i> 分流危險資料刪除控制</label>
-                <div style="display: flex; gap: 10px;">
+                <div class="toolbar-buttons">
                     <button class="btn-tool btn-delete-orders" onclick="deleteDataSelection('orders')">
                         <i class="fa-solid fa-user-minus"></i> 1. 刪除所有顧客訂購資料
                     </button>
@@ -147,21 +176,23 @@
                     <input id="qty" type="number" min="1" placeholder="例如：50">
                 </div>
             </div>
-            <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
-                <div class="form-group">
-                    <label>上架商品圖片 (支援自動智慧壓縮、手機相機與檔案)</label>
-                    <div class="file-upload-wrapper">
-                        <label for="imageFileInput" class="file-upload-btn">
-                            <i class="fa-solid fa-image"></i> 選擇圖片檔案
-                        </label>
-                        <input type="file" id="imageFileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
-                        <img id="previewThumb" class="image-preview-thumbnail">
-                        <span id="uploadStatusText" class="file-status-text">尚未選擇檔案</span>
+            <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div style="display: flex; flex-direction: column; gap: 15px; grid-column: 1 / -1;">
+                    <div class="form-group">
+                        <label>上架商品圖片 (支援自動智慧壓縮、手機相機與檔案)</label>
+                        <div class="file-upload-wrapper">
+                            <label for="imageFileInput" class="file-upload-btn">
+                                <i class="fa-solid fa-image"></i> 選擇圖片檔案
+                            </label>
+                            <input type="file" id="imageFileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
+                            <img id="previewThumb" class="image-preview-thumbnail">
+                            <span id="uploadStatusText" class="file-status-text">尚未選擇檔案</span>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>內容物說明與內文文字</label>
-                    <textarea id="description" placeholder="請輸入內容物成分、口感描述等介紹文字..."></textarea>
+                    <div class="form-group">
+                        <label>內容物說明與內文文字</label>
+                        <textarea id="description" placeholder="請輸入內容物成分、口感描述等介紹文字..."></textarea>
+                    </div>
                 </div>
             </div>
             <button class="btn-add" onclick="saveProduct()"><i class="fa-solid fa-cloud-arrow-up"></i> 發布商品至前台</button>
@@ -174,20 +205,22 @@
 
         <div class="admin-card">
             <h3><i class="fa-solid fa-list-check"></i> 顧客預購訂單明細與金額總計</h3>
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th class="col-name">訂購人姓名</th>
-                        <th class="col-phone">聯絡電話</th>
-                        <th class="col-date">預訂取貨日期</th>
-                        <th class="col-items">訂購項目與數量</th>
-                        <th class="col-total">訂單金額總計</th>
-                    </tr>
-                </thead>
-                <tbody id="orders">
-                    <tr><td colspan="5" style="text-align: center; color: #9c8e82;">尚無任何預購訂單資料</td></tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th class="col-name">訂購人姓名</th>
+                            <th class="col-phone">聯絡電話</th>
+                            <th class="col-date">預訂取貨日期</th>
+                            <th class="col-items">訂購項目與數量</th>
+                            <th class="col-total">訂單金額總計</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders">
+                        <tr><td colspan="5" style="text-align: center; color: #9c8e82;">尚無任何預購訂單資料</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -329,63 +362,53 @@
             XLSX.writeFile(workbook, `焰麥時光_預購訂單總表_${dateTag}.xlsx`);
         }
 
-       window.deleteDataSelection = async function(type) {
-    let title = type === 'orders' ? "「1. 所有顧客訂購的資料（將連帶歸零麵包已訂數量）」" : "「2. 所有已上架的麵包庫存資料」";
-    const step1 = confirm(`⚠️ 核心警告：您確定要刪除 ${title} 嗎？`);
-    if (!step1) return;
-    
-    try {
-        if (type === 'orders') {
-            // 1. 先徹底刪除顧客訂單
-            await remove(ref(db, "orders"));
+        /* 🌟 沿用上一輪調整：刪除顧客資料時，麵包庫存會同步歸零計算 */
+        window.deleteDataSelection = async function(type) {
+            let title = type === 'orders' ? "「1. 所有顧客訂購的資料（將連帶歸零麵包已訂數量）」" : "「2. 所有已上架的麵包庫存資料」";
+            const step1 = confirm(`⚠️ 核心警告：您確定要刪除 ${title} 嗎？`);
+            if (!step1) return;
             
-            // 2. 抓取目前所有的麵包資料，準備把已售數量(sold)全部調回 0
-            const prodSnapshot = await get(ref(db, "products"));
-            const prodData = prodSnapshot.val();
-            
-            if (prodData) {
-                let updates = {};
-                // 跑迴圈找出所有日期與品項
-                for (let date in prodData) {
-                    for (let productName in prodData[date]) {
-                        // 設定將該產品的 sold 欄位重置為 0
-                        updates[`products/${date}/${productName}/sold`] = 0;
+            try {
+                if (type === 'orders') {
+                    await remove(ref(db, "orders"));
+                    const prodSnapshot = await get(ref(db, "products"));
+                    const prodData = prodSnapshot.val();
+                    
+                    if (prodData) {
+                        let updates = {};
+                        for (let date in prodData) {
+                            for (let productName in prodData[date]) {
+                                updates[`products/${date}/${productName}/sold`] = 0;
+                            }
+                        }
+                        await update(ref(db), updates);
                     }
+                    alert(`🗑️ 成功！已清空所有顧客訂單，並將所有已上架麵包的已訂數量歸零、重新計算庫存！`);
+                } else {
+                    await remove(ref(db, type));
+                    alert(`🗑️ 成功！已徹底清空資料庫內 ${title}。`);
                 }
-                // 一口氣批量更新 Firebase，效率最高
-                await update(ref(db), updates);
+                
+                initBackend(); 
+            } catch (err) {
+                console.error(err);
+                alert("刪除或重置過程中發生錯誤，請檢查網路連線。");
             }
-            alert(`🗑️ 成功！已清空所有顧客訂單，並將所有已上架麵包的已訂數量歸零、重新計算庫存！`);
-        } else {
-            // 如果選 2，就跟原本一樣直接刪除所有麵包架構
-            await remove(ref(db, type));
-            alert(`🗑️ 成功！已徹底清空資料庫內 ${title}。`);
         }
-        
-        initBackend(); // 重新整理後台畫面
-    } catch (err) {
-        console.error(err);
-        alert("刪除或重置過程中發生錯誤，請檢查網路連線。");
-    }
-}
 
-        // 🌟 核心新增：獨立刪除單一麵包品項的功能
         window.deleteSingleProduct = async function(date, productName) {
             const confirmDelete = confirm(`確定要將 ${date} 的商品「${productName}」單獨下架刪除嗎？`);
             if (!confirmDelete) return;
 
             try {
-                // 直接指向該日期下的特定麵包名稱路徑並刪除
                 await remove(ref(db, `products/${date}/${productName}`));
-                
-                // 防護機制：如果該日期刪到最後已經沒有任何麵包了，就把日期節點也順便清掉，避免留下一行空的日期
                 const snapshot = await get(ref(db, `products/${date}`));
                 if (!snapshot.exists() || Object.keys(snapshot.val()).length === 0) {
                     await remove(ref(db, `products/${date}`));
                 }
 
                 alert(`🗑️ 已成功刪除商品：${productName}`);
-                initBackend(); // 重新整理網頁資料
+                initBackend(); 
             } catch (error) {
                 console.error(error);
                 alert("刪除失敗，請檢查網路連線後再試一次。");
@@ -450,7 +473,6 @@
                     let price = prod.price || 0;
                     let desc = prod.desc ? ` <small style="color:#a39589;">(${prod.desc})</small>` : "";
 
-                    // 🌟 修改點：在每個品項的最尾端，新增單項刪除按鈕，並傳入對應的日期與名稱
                     html += `
                         <div class="item-row">
                             <div class="item-info">
