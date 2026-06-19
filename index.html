@@ -67,12 +67,11 @@
         
         /* ✨ 調整後不裁切的圖片區塊樣式 */
         .product-img { 
-            width: 100%; 
-            height: 140px; 
-            object-fit: contain; 
-            background: #faf6f0; 
-            padding: 8px;
-        }
+    width: 100%; 
+    height: 180px;            /* ✨ 將原本的 140px 調高到 180px，給照片更多顯示空間 */
+    object-fit: cover; 
+    background: #faf8f5; 
+}
         
         .product-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; gap: 6px; }
         .product-info h3 { font-size: 16px; font-weight: 700; }
