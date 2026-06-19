@@ -1,174 +1,186 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>暖麥時光 - 法式手工烘焙預購系統</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-amber: #8c6239;
+            --light-bg: #fdfbf7;
+            --text-dark: #4a3c31;
+            --border-color: #f3ede2;
+            --accent-orange: #d97706;
+        }
 
-<meta charset="UTF-8">
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; color: var(--text-dark); }
+        body { background-color: var(--light-bg); }
 
-<title>焰麥手作烘焙</title>
+        /* --- 頂部導覽列 --- */
+        header {
+            background: #fff; border-bottom: 1px solid var(--border-color);
+            padding: 15px 5%; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+        .logo { font-size: 24px; font-weight: 700; color: var(--primary-amber); text-decoration: none; }
+        .nav-links { display: flex; gap: 25px; list-style: none; font-size: 14px; }
+        .nav-links a { text-decoration: none; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--accent-orange); }
 
-<link rel="stylesheet" href="style.css">
+        /* --- 滿版網頁橫幅 (Hero Banner) --- */
+        .hero {
+            height: 480px;
+            background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80') no-repeat center center;
+            background-size: cover; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white;
+        }
+        .hero h1 { color: white; font-size: 42px; font-weight: 500; letter-spacing: 2px; margin-bottom: 12px; }
+        .hero p { color: #f3ede2; font-size: 16px; letter-spacing: 1px; margin-bottom: 25px; }
+        .hero .btn-shop { padding: 10px 24px; background: white; color: var(--primary-amber); text-decoration: none; font-weight: 500; border-radius: 4px; transition: all 0.3s; }
+        .hero .btn-shop:hover { background: var(--primary-amber); color: white; }
 
+        /* --- 預購顧客資料區塊 --- */
+        .booking-info-section { max-width: 1200px; margin: 40px auto 0; padding: 0 5%; }
+        .info-grid {
+            background: white; padding: 25px; border-radius: 8px; border: 1px solid var(--border-color);
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 14px; font-weight: 500; color: #7c6e62; }
+        .form-group input, .form-group select { padding: 10px; border: 1px solid #e5dfd5; border-radius: 4px; background: #fff; font-size: 14px; outline: none; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary-amber); }
+
+        /* --- 人氣推薦商品區域 (Grid Layout) --- */
+        .section-title { text-align: center; margin: 50px 0 30px; }
+        .section-title h2 { font-size: 26px; font-weight: 500; margin-bottom: 5px; }
+        .section-title p { font-size: 13px; color: #9c8e82; }
+
+        .products-grid { max-width: 1200px; margin: 0 auto 50px; padding: 0 5%; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; }
+        .product-card { background: white; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 6px 15px rgba(140,98,57,0.08); }
+        .product-img { width: 100%; height: 200px; object-fit: cover; background: #f5f5f5; }
+        .product-body { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
+        .product-name { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+        .product-stock-info { font-size: 12px; color: #9c8e82; margin-bottom: 12px; line-height: 1.5; }
+        .product-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+        .product-price { font-size: 16px; font-weight: 700; color: var(--accent-orange); }
+        .product-price::before { content: "NT$ "; font-size: 12px; }
+
+        /* 數量控制器 (加減鈕) */
+        .qty-controller { display: flex; align-items: center; border: 1px solid #e5dfd5; border-radius: 4px; overflow: hidden; background: #fff; }
+        .qty-btn { width: 28px; height: 28px; background: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .qty-btn:hover { background: #fdfbf7; }
+        .qty-input { width: 35px; height: 28px; text-align: center; border: none; border-left: 1px solid #e5dfd5; border-right: 1px solid #e5dfd5; outline: none; font-size: 13px; font-weight: 500; }
+
+        /* --- 我的預購購物車總覽 --- */
+        .cart-section { max-width: 1200px; margin: 0 auto 60px; padding: 0 5%; }
+        .cart-card { background: white; border: 1px solid var(--border-color); border-radius: 6px; padding: 25px; }
+        .cart-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+        .cart-table th, .cart-table td { padding: 12px; border-bottom: 1px solid var(--border-color); text-align: left; }
+        .cart-table th { color: #7c6e62; font-weight: 500; background: #faf8f5; }
+        .cart-total-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--border-color); }
+        .total-amount { font-size: 20px; font-weight: 700; color: var(--accent-orange); }
+        
+        .btn-submit { padding: 12px 35px; background: var(--primary-amber); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 15px; font-weight: 500; transition: background 0.2s; }
+        .btn-submit:hover { background: #6f4e2d; }
+
+        /* --- 網頁頁尾 Footer --- */
+        footer { background: #3c322a; padding: 40px 5%; text-align: center; border-top: 1px solid #2e2620; }
+        footer p { color: #a39589; font-size: 12px; line-height: 1.8; }
+    </style>
 </head>
-
 <body>
 
-<header>
+    <header>
+        <a href="#" class="logo">暖麥時光</a>
+        <ul class="nav-links">
+            <li><a href="#" style="color: var(--accent-orange);">首頁</a></li>
+            <li><a href="#">全部食品</a></li>
+            <li><a href="#">關於我們</a></li>
+            <li><a href="#">購物車</a></li>
+        </ul>
+    </header>
 
-<div class="logo">
-🔥焰麥手作烘焙🔥
-</div>
+    <section class="hero">
+        <h1>法式手工烘焙</h1>
+        <p>每一口都來自法式細緻的浪漫滋味</p>
+        <a href="#products-section" class="btn-shop">立即選購</a>
+    </section>
 
-<div class="subtitle">
-每日新鮮出爐
-</div>
+    <section class="booking-info-section">
+        <div class="info-grid">
+            <div class="form-group">
+                <label><i class="fa-solid fa-user"></i> 訂購人真實姓名</label>
+                <input type="text" id="name" placeholder="請輸入姓名">
+            </div>
+            <div class="form-group">
+                <label><i class="fa-solid fa-phone"></i> 聯絡電話</label>
+                <input type="tel" id="phone" placeholder="請輸入電話">
+            </div>
+            <div class="form-group">
+                <label><i class="fa-solid fa-calendar-days"></i> 請選擇取貨日期</label>
+                <select id="dateSelect"></select>
+            </div>
+        </div>
+    </section>
 
-</header>
+    <section id="products-section">
+        <div class="section-title">
+            <h2>人氣推薦</h2>
+            <p>最受歡迎的經典熟食風味</p>
+        </div>
+        <div class="products-grid" id="products"></div>
+    </section>
 
-<div class="container">
+    <section class="cart-section">
+        <div class="cart-card">
+            <h3 style="font-size: 18px; font-weight: 500;"><i class="fa-solid fa-basket-shopping"></i> 我的預購明細</h3>
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>商品品名</th>
+                        <th>單價</th>
+                        <th>數量</th>
+                        <th>小計</th>
+                    </tr>
+                </thead>
+                <tbody id="cart-items-tbody">
+                    <tr><td colspan="4" style="text-align: center; color: #9c8e82;">請在上方增減選購數量項目</td></tr>
+                </tbody>
+            </table>
+            <div class="cart-total-bar">
+                <div>已選品項合計：<span class="total-amount" id="grand-total-display">NT$ 0</span></div>
+                <button class="btn-submit" onclick="submitOrder()"><i class="fa-solid fa-check"></i> 確認送出預購訂單</button>
+            </div>
+        </div>
+    </section>
 
-<div class="products">
+    <footer>
+        <p>© 2026 暖麥時光 All Rights Reserved. | 用心烘焙，每一份甜蜜。</p>
+    </footer>
 
-<div class="card">
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get, push, set, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-<img src="images/bread1.jpg">
+        // ⚠️ 請在此處配置您的實際 Firebase Realtime Database 金鑰與設定 ⚠️
+        const firebaseConfig = {
+            apiKey: "你的KEY",
+            authDomain: "你的PROJECT.firebaseapp.com",
+            databaseURL: "https://你的PROJECT-default-rtdb.firebaseio.com",
+            projectId: "你的PROJECT"
+        };
 
-<div class="card-body">
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-<h3>鮮奶吐司</h3>
+        // 全域快取當前選取日期底下的所有後台商品原始資料
+        let currentMonthProductsRaw = {};
 
-<div class="price">
-$120
-</div>
+        loadDates();
 
-<button onclick="addCart('鮮奶吐司',120)">
-加入購物車
-</button>
-
-</div>
-</div>
-
-<div class="card">
-
-<img src="images/bread2.jpg">
-
-<div class="card-body">
-
-<h3>法國麵包</h3>
-
-<div class="price">
-$80
-</div>
-
-<button onclick="addCart('法國麵包',80)">
-加入購物車
-</button>
-
-</div>
-</div>
-
-</div>
-
-<div class="cart">
-
-<h2>購物車</h2>
-
-<div id="cartList"></div>
-
-<hr>
-
-姓名
-
-<input id="customer">
-
-<br><br>
-
-電話
-
-<input id="phone">
-
-<br><br>
-
-<button onclick="sendOrder()">
-送出訂單
-</button>
-
-</div>
-
-</div>
-
-<script type="module">
-
-import {
- db,
- ref,
- push
-}
-from "./firebase.js";
-
-let cart=[];
-
-window.addCart=function(name,price){
-
- cart.push({
-  name,
-  price
- });
-
- renderCart();
-}
-
-function renderCart(){
-
- let html='';
-
- cart.forEach(item=>{
-
-  html+=`
-  <div>
-  ${item.name}
-  $${item.price}
-  </div>
-  `;
- });
-
- document.getElementById(
- 'cartList'
- ).innerHTML=html;
-}
-
-window.sendOrder=function(){
-
- let customer=
- document.getElementById(
- 'customer'
- ).value;
-
- let phone=
- document.getElementById(
- 'phone'
- ).value;
-
- push(
-  ref(db,'orders'),
-  {
-   customer,
-   phone,
-   cart,
-   status:'新訂單',
-   createTime:
-   new Date().toISOString()
-  }
- );
-
- alert("訂單送出成功");
-
- cart=[];
-
- renderCart();
-}
-
-</script>
-
-</body>
-</html>
+        // 1. 載入資料庫內現有開放的取貨日期列表
+        async function loadDates() {
+            const snapshot = await get(ref(db, "products"));
