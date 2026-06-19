@@ -329,18 +329,45 @@
             XLSX.writeFile(workbook, `焰麥時光_預購訂單總表_${dateTag}.xlsx`);
         }
 
-        window.deleteDataSelection = async function(type) {
-            let title = type === 'orders' ? "「1. 所有顧客訂購的資料」" : "「2. 所有已上架的麵包庫存資料」";
-            const step1 = confirm(`⚠️ 核心警告：您確定要刪除 ${title} 嗎？`);
-            if (!step1) return;
-            try {
-                await remove(ref(db, type));
-                alert(`🗑️ 成功！已徹底清空資料庫內 ${title}。`);
-                initBackend(); 
-            } catch (err) {
-                console.error(err);
+       window.deleteDataSelection = async function(type) {
+    let title = type === 'orders' ? "「1. 所有顧客訂購的資料（將連帶歸零麵包已訂數量）」" : "「2. 所有已上架的麵包庫存資料」";
+    const step1 = confirm(`⚠️ 核心警告：您確定要刪除 ${title} 嗎？`);
+    if (!step1) return;
+    
+    try {
+        if (type === 'orders') {
+            // 1. 先徹底刪除顧客訂單
+            await remove(ref(db, "orders"));
+            
+            // 2. 抓取目前所有的麵包資料，準備把已售數量(sold)全部調回 0
+            const prodSnapshot = await get(ref(db, "products"));
+            const prodData = prodSnapshot.val();
+            
+            if (prodData) {
+                let updates = {};
+                // 跑迴圈找出所有日期與品項
+                for (let date in prodData) {
+                    for (let productName in prodData[date]) {
+                        // 設定將該產品的 sold 欄位重置為 0
+                        updates[`products/${date}/${productName}/sold`] = 0;
+                    }
+                }
+                // 一口氣批量更新 Firebase，效率最高
+                await update(ref(db), updates);
             }
+            alert(`🗑️ 成功！已清空所有顧客訂單，並將所有已上架麵包的已訂數量歸零、重新計算庫存！`);
+        } else {
+            // 如果選 2，就跟原本一樣直接刪除所有麵包架構
+            await remove(ref(db, type));
+            alert(`🗑️ 成功！已徹底清空資料庫內 ${title}。`);
         }
+        
+        initBackend(); // 重新整理後台畫面
+    } catch (err) {
+        console.error(err);
+        alert("刪除或重置過程中發生錯誤，請檢查網路連線。");
+    }
+}
 
         // 🌟 核心新增：獨立刪除單一麵包品項的功能
         window.deleteSingleProduct = async function(date, productName) {
