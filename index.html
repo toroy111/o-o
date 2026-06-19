@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>暖麥時光 - 法式手工烘焙預購系統</title>
+    <title>焰麥時光 - 法式手工烘焙預購系統</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     
@@ -25,320 +25,384 @@
             padding: 15px 5%; display: flex; justify-content: space-between; align-items: center;
             position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
         }
-        .logo { font-size: 24px; font-weight: 700; color: var(--primary-amber); text-decoration: none; }
-        .nav-links { display: flex; gap: 25px; list-style: none; font-size: 14px; }
-        .nav-links a { text-decoration: none; transition: color 0.2s; }
-        .nav-links a:hover { color: var(--accent-orange); }
+        .logo { font-size: 22px; font-weight: 700; color: var(--primary-amber); display: flex; align-items: center; gap: 8px; }
+        .logo i { color: var(--accent-orange); }
 
-        /* --- 滿版網頁橫幅 (Hero Banner) --- */
+        /* --- 主視覺區 --- */
         .hero {
-            height: 480px;
-            background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80') no-repeat center center;
-            background-size: cover; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white;
+            background: linear-gradient(rgba(74,60,49,0.6), rgba(74,60,49,0.5)), url('https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover; background-position: center; height: 260px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff; text-align: center; padding: 0 20px;
         }
-        .hero h1 { color: white; font-size: 42px; font-weight: 500; letter-spacing: 2px; margin-bottom: 12px; }
-        .hero p { color: #f3ede2; font-size: 16px; letter-spacing: 1px; margin-bottom: 25px; }
-        .hero .btn-shop { padding: 10px 24px; background: white; color: var(--primary-amber); text-decoration: none; font-weight: 500; border-radius: 4px; transition: all 0.3s; }
-        .hero .btn-shop:hover { background: var(--primary-amber); color: white; }
+        .hero h1 { color: #fff; font-size: 32px; font-weight: 700; margin-bottom: 10px; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+        .hero p { color: #f3ede2; font-size: 16px; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
 
-        /* --- 預購顧客資料區塊 --- */
-        .booking-info-section { max-width: 1200px; margin: 40px auto 0; padding: 0 5%; }
-        .info-grid {
-            background: white; padding: 25px; border-radius: 8px; border: 1px solid var(--border-color);
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;
-        }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group label { font-size: 14px; font-weight: 500; color: #7c6e62; }
-        .form-group input, .form-group select { padding: 10px; border: 1px solid #e5dfd5; border-radius: 4px; background: #fff; font-size: 14px; outline: none; }
-        .form-group input:focus, .form-group select:focus { border-color: var(--primary-amber); }
-
-        /* --- 商品區域 (Grid Layout) --- */
-        .section-title { text-align: center; margin: 50px 0 30px; }
-        .section-title h2 { font-size: 26px; font-weight: 500; margin-bottom: 5px; }
-        .section-title p { font-size: 13px; color: #9c8e82; }
-
-        .products-grid { max-width: 1200px; margin: 0 auto 50px; padding: 0 5%; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; }
-        .product-card { background: white; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
-        .product-card:hover { transform: translateY(-4px); box-shadow: 0 6px 15px rgba(140,98,57,0.08); }
-        .product-img { width: 100%; height: 200px; object-fit: cover; background: #f5f5f5; }
-        .product-body { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
-        .product-name { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
-        .product-desc { font-size: 13px; color: #7c6e62; margin-bottom: 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .product-stock-info { font-size: 12px; color: #9c8e82; margin-bottom: 12px; line-height: 1.5; margin-top: auto; }
-        .product-footer { display: flex; justify-content: space-between; align-items: center; }
-        .product-price { font-size: 16px; font-weight: 700; color: var(--accent-orange); }
-        .product-price::before { content: "NT$ "; font-size: 12px; }
-
-        /* 數量控制器 (加減鈕) */
-        .qty-controller { display: flex; align-items: center; border: 1px solid #e5dfd5; border-radius: 4px; overflow: hidden; background: #fff; }
-        .qty-btn { width: 28px; height: 28px; background: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-        .qty-btn:hover { background: #fdfbf7; }
-        .qty-input { width: 35px; height: 28px; text-align: center; border: none; border-left: 1px solid #e5dfd5; border-right: 1px solid #e5dfd5; outline: none; font-size: 13px; font-weight: 500; }
-
-        /* --- 我的預購購物車總覽 --- */
-        .cart-section { max-width: 1200px; margin: 0 auto 60px; padding: 0 5%; }
-        .cart-card { background: white; border: 1px solid var(--border-color); border-radius: 6px; padding: 25px; }
-        .cart-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
-        .cart-table th, .cart-table td { padding: 12px; border-bottom: 1px solid var(--border-color); text-align: left; }
-        .cart-table th { color: #7c6e62; font-weight: 500; background: #faf8f5; }
-        .cart-total-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--border-color); }
-        .total-amount { font-size: 20px; font-weight: 700; color: var(--accent-orange); }
+        /* --- 核心內容版面 --- */
+        .main-container { max-width: 1100px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr; gap: 40px; }
         
-        .btn-submit { padding: 12px 35px; background: var(--primary-amber); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 15px; font-weight: 500; transition: background 0.2s; }
+        @media (min-width: 900px) {
+            .main-container { grid-template-columns: 1fr 380px; align-items: start; }
+        }
+
+        .section-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid var(--primary-amber); display: flex; align-items: center; gap: 8px; }
+
+        /* --- 左側：顧客資料填寫與預定選項 --- */
+        .order-form-card { background: #fff; border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.01); }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 25px; }
+        @media (min-width: 600px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+        }
+        
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-size: 14px; font-weight: 700; color: #6b5a4c; }
+        .form-group input, .form-group select, .form-group textarea { padding: 12px; border: 1px solid #e5dfd5; border-radius: 6px; font-size: 15px; outline: none; background-color: #fff; transition: border 0.2s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary-amber); box-shadow: 0 0 0 3px rgba(140,98,57,0.1); }
+        .form-group textarea { resize: vertical; min-height: 70px; font-family: inherit; }
+
+        /* 麵包卡片清單區域 */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-top: 15px; }
+        .product-card { background: #fff; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.03); }
+        .product-img { width: 100%; height: 140px; object-fit: cover; background: #faf8f5; }
+        .product-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; gap: 6px; }
+        .product-info h3 { font-size: 16px; font-weight: 700; }
+        .product-desc { font-size: 13px; color: #8a7c70; line-height: 1.4; height: 38px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .product-status { font-size: 12px; color: #a39589; margin-top: 4px; }
+        .product-price-row { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--border-color); }
+        .price { color: var(--accent-orange); font-weight: 700; font-size: 16px; }
+        
+        /* 數量控制按鈕 */
+        .qty-control { display: flex; align-items: center; border: 1px solid #e5dfd5; border-radius: 4px; overflow: hidden; width: 100px; height: 32px; }
+        .qty-btn { width: 30px; height: 100%; background: #faf8f5; border: none; cursor: pointer; font-size: 14px; font-weight: 700; transition: background 0.2s; }
+        .qty-btn:hover { background: #eee1d5; }
+        .qty-input { width: 40px; height: 100%; border: none; border-left: 1px solid #e5dfd5; border-right: 1px solid #e5dfd5; text-align: center; font-size: 14px; font-weight: 500; outline: none; }
+
+        /* --- 右側：購物車明細與計算面板 --- */
+        .cart-sticky-panel { background: #fff; border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.01); position: sticky; top: 100px; }
+        .cart-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        .cart-table th, .cart-table td { padding: 10px 4px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .cart-table th { color: #8a7c70; font-weight: 500; font-size: 13px; }
+        .cart-total-bar { margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--border-color); display: flex; flex-direction: column; gap: 15px; }
+        .total-amount { font-size: 22px; font-weight: 700; color: var(--accent-orange); float: right; }
+        .btn-submit { width: 100%; padding: 14px; background: var(--primary-amber); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 700; display: flex; justify-content: center; align-items: center; gap: 8px; transition: background 0.2s; box-shadow: 0 4px 12px rgba(140,98,57,0.15); }
         .btn-submit:hover { background: #6f4e2d; }
 
-        footer { background: #3c322a; padding: 40px 5%; text-align: center; border-top: 1px solid #2e2620; }
-        footer p { color: #a39589; font-size: 12px; line-height: 1.8; }
+        footer { text-align: center; padding: 40px 20px; background: #fff; border-top: 1px solid var(--border-color); margin-top: 60px; font-size: 13px; color: #a39589; }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="#" class="logo">暖麥時光</a>
-        <ul class="nav-links">
-            <li><a href="#" style="color: var(--accent-orange);">首頁</a></li>
-            <li><a href="#">全部食品</a></li>
-            <li><a href="#">關於我們</a></li>
-            <li><a href="#">購物車</a></li>
-        </ul>
+        <div class="logo"><i class="fa-solid fa-bread-slice"></i> 焰麥時光</div>
     </header>
 
     <section class="hero">
-        <h1>法式手工烘焙</h1>
-        <p>每一口都來自法式細緻的浪漫滋味</p>
-        <a href="#products-section" class="btn-shop">立即選購</a>
+        <h1>焰麥時光 手作烘焙預購系統</h1>
+        <p>每日新鮮揉製發酵，為您提前保留美味</p>
     </section>
 
-    <section class="booking-info-section">
-        <div class="info-grid">
-            <div class="form-group">
-                <label><i class="fa-solid fa-user"></i> 訂購人真實姓名</label>
-                <input type="text" id="name" placeholder="請輸入姓名">
+    <section class="main-container">
+        
+        <div style="display: flex; flex-direction: column; gap: 30px;">
+            <div class="order-form-card">
+                <h2 class="section-title"><i class="fa-solid fa-address-card"></i> 填寫預購取貨人資訊</h2>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>顧客姓名</label>
+                        <input id="name" type="text" placeholder="請輸入取貨人姓名">
+                    </div>
+                    <div class="form-group">
+                        <label>聯絡電話</label>
+                        <input id="phone" type="tel" placeholder="例如：0912345678">
+                    </div>
+                    <div class="form-group">
+                        <label>預訂取貨日期</label>
+                        <select id="dateSelect">
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>預計取貨時間段</label>
+                        <select id="timeSelect">
+                            <option value="上午時段 (08:00 - 12:00)">上午時段 (08:00 - 12:00)</option>
+                            <option value="下午時段 (12:00 - 17:00)" selected>下午時段 (12:00 - 17:00)</option>
+                            <option value="傍晚時段 (17:00 - 20:00)">傍晚時段 (17:00 - 20:00)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>指定取貨地點</label>
+                        <select id="locationSelect">
+                            <option value="早餐店">1. 早餐店</option>
+                            <option value="自取">2. 自取</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>訂單備註（選填）</label>
+                        <textarea id="note" placeholder="例如：切片、不要包裝袋，或有其他特殊需求請填寫於此..."></textarea>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label><i class="fa-solid fa-phone"></i> 聯絡電話</label>
-                <input type="tel" id="phone" placeholder="請輸入電話">
-            </div>
-            <div class="form-group">
-                <label><i class="fa-solid fa-calendar-days"></i> 請選擇取貨日期</label>
-                <select id="dateSelect"></select>
+
+            <div class="order-form-card">
+                <h2 class="section-title"><i class="fa-solid fa-wheat-awn"></i> 當日限定烘焙品項增減選購</h2>
+                <div id="products" class="products-grid">
+                    <p style="color: #a39589; grid-column: span 3; text-align: center; padding: 20px;">正在載入今日限定美味...</p>
+                </div>
             </div>
         </div>
-    </section>
 
-    <section id="products-section">
-        <div class="section-title">
-            <h2>今日開放預購種類</h2>
-            <p>嚴選新鮮食材，當日現做限量供應</p>
-        </div>
-        <div class="products-grid" id="products"></div>
-    </section>
-
-    <section class="cart-section">
-        <div class="cart-card">
-            <h3 style="font-size: 18px; font-weight: 500;"><i class="fa-solid fa-basket-shopping"></i> 我的預購明細</h3>
+        <div class="cart-sticky-panel">
+            <h2 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-basket-shopping"></i> 購物預定清單</h2>
             <table class="cart-table">
                 <thead>
                     <tr>
-                        <th>商品品名</th>
-                        <th>單價</th>
-                        <th>數量</th>
-                        <th>小計</th>
+                        <th>品項</th>
+                        <th style="text-align: center; width: 60px;">數量</th>
+                        <th style="text-align: right; width: 80px;">小計</th>
                     </tr>
                 </thead>
                 <tbody id="cart-items-tbody">
-                    <tr><td colspan="4" style="text-align: center; color: #9c8e82;">請在上方增減選購數量項目</td></tr>
+                    <tr><td colspan="3" style="text-align: center; color: #9c8e82; padding: 20px 0;">尚未選擇 any 商品項目</td></tr>
                 </tbody>
             </table>
             <div class="cart-total-bar">
-                <div>已選品項合計：<span class="total-amount" id="grand-total-display">NT$ 0</span></div>
-                <button class="btn-submit" onclick="submitOrder()"><i class="fa-solid fa-check"></i> 確認送出預購訂單</button>
+                <div style="font-size: 15px; font-weight: 500;">總金額合計：<span class="total-amount" id="grand-total-display">NT$ 0</span></div>
+                <button class="btn-submit" onclick="submitOrder()"><i class="fa-solid fa-paper-plane"></i> 安全送出預購訂單</button>
             </div>
         </div>
+
     </section>
 
     <footer>
-        <p>© 2026 暖麥時光 All Rights Reserved. | 用心烘焙，每一份甜蜜。</p>
+        <p>© 2026 焰麥時光 All Rights Reserved. | 用心烘焙，溫暖每一刻。</p>
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, get, push, set, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // ⚠️ 請在此處配置您的實際 Firebase Realtime Database 設定 ⚠️
         const firebaseConfig = {
-           apiKey: "AIzaSyAgeP2a6Z-TqJaZ5F0j_2UoXVQ_WE3sckw",
-  authDomain: "jaffff-34d02.firebaseapp.com",
-  databaseURL: "https://jaffff-34d02-default-rtdb.firebaseio.com",
-  projectId: "jaffff-34d02",
-  storageBucket: "jaffff-34d02.firebasestorage.app",
-  messagingSenderId: "332430248808",
-  appId: "1:332430248808:web:10a92f48234bf18ce664dd",
-  measurementId: "G-Z975D1EG21"
+            apiKey: "AIzaSyAgeP2a6Z-TqJaZ5F0j_2UoXVQ_WE3sckw",
+            authDomain: "jaffff-34d02.firebaseapp.com",
+            databaseURL: "https://jaffff-34d02-default-rtdb.firebaseio.com",
+            projectId: "jaffff-34d02",
+            storageBucket: "jaffff-34d02.firebasestorage.app",
+            messagingSenderId: "332430248808",
+            appId: "1:332430248808:web:10a92f48234bf18ce664dd",
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let currentProductsRaw = {}; // 存放當前日期底下的麵包物件資料
-        let cart = {}; // 快取購物車狀態 { 麵包名稱: 數量 }
+        let currentProductsDataSnapshot = {}; 
+        let baseDatabaseDate = ""; 
+        let cart = {}; 
 
-        // 1. 自動從資料庫獲取所有有排程的日期，載入下拉選單
+        const weekDayNames = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+
         async function loadDates() {
-            const snapshot = await get(ref(db, "products"));
-            const data = snapshot.val();
-            const select = document.getElementById("dateSelect");
-            
-            if (!data) {
-                select.innerHTML = "<option value=''>目前無任何開放日期</option>";
-                document.getElementById("products").innerHTML = "<p style='grid-column:1/-1; text-align:center; color:#9c8e82;'>烘焙師正在加緊排程中，敬請期待！</p>";
+            try {
+                const snapshot = await get(ref(db, "products"));
+                const data = snapshot.val();
+                const select = document.getElementById("dateSelect");
+                
+                if (!data || Object.keys(data).length === 0) {
+                    document.getElementById("products").innerHTML = `<p style="color: #a39589; grid-column: span 3; text-align: center; padding: 20px;">目前後台尚未上架任何生產排程喔！</p>`;
+                    return;
+                }
+                
+                select.innerHTML = ""; 
+                let sortedDates = Object.keys(data).sort();
+                
+                let baseDateStr = sortedDates[0]; 
+                let baseDate = new Date(baseDateStr);
+
+                for (let i = 0; i <= 3; i++) {
+                    let nextDate = new Date(baseDate);
+                    nextDate.setDate(baseDate.getDate() + i);
+                    
+                    let year = nextDate.getFullYear();
+                    let month = String(nextDate.getMonth() + 1).padStart(2, '0');
+                    let day = String(nextDate.getDate()).padStart(2, '0');
+                    let formattedDate = `${year}-${month}-${day}`;
+
+                    let dayOfWeekText = weekDayNames[nextDate.getDay()];
+
+                    let opt = document.createElement("option");
+                    opt.value = formattedDate;
+                    opt.setAttribute("data-base", baseDateStr); 
+                    
+                    if (i === 0) {
+                        opt.textContent = `📅 販售當日：${formattedDate} (${dayOfWeekText})`;
+                    } else {
+                        opt.textContent = `📅 其他時間：${formattedDate} (${dayOfWeekText})`;
+                    }
+                    select.appendChild(opt);
+                }
+
+                let defaultDate = select.options[0].value;
+                select.value = defaultDate;
+                fetchProductsByDate(baseDateStr); 
+                baseDatabaseDate = baseDateStr;
+
+            } catch (err) {
+                console.error("載入日期清單失敗", err);
+            }
+        }
+
+        async function fetchProductsByDate(dbDate) {
+            if (!dbDate) {
+                document.getElementById("products").innerHTML = `<p style="color: #a39589; grid-column: span 3; text-align: center; padding:20px;">請選擇販售日期</p>`;
+                cart = {};
+                renderCart();
                 return;
             }
 
-            let sortedDates = Object.keys(data).sort();
-            select.innerHTML = sortedDates.map(date => `<option value="${date}">${date}</option>`).join('');
-            
-            // 監聽日期更換
-            select.addEventListener("change", () => loadProducts(select.value));
-            // 預設加載第一個日期的商品
-            loadProducts(sortedDates[0]);
-        }
+            const snapshot = await get(ref(db, "products/" + dbDate));
+            const data = snapshot.val();
+            currentProductsDataSnapshot = data || {};
+            cart = {}; 
 
-        // 2. 根據所選日期，將後台發布的資料撈出並渲染到前台
-        async function loadProducts(date) {
-            if (!date) return;
-            cart = {}; // 更換日期，清空購物車
-            updateCartDisplay();
-
-            const snapshot = await get(ref(db, "products/" + date));
-            const data = snapshot.val() || {};
-            currentProductsRaw = data;
-
-            const productsContainer = document.getElementById("products");
-            if (Object.keys(data).length === 0) {
-                productsContainer.innerHTML = "<p style='grid-column:1/-1; text-align:center; color:#9c8e82;'>此日期目前無販售種類。</p>";
+            if (!data || Object.keys(data).length === 0) {
+                document.getElementById("products").innerHTML = `<p style="color: red; grid-column: span 3; text-align: center; padding:20px;">⚠️ 該日期目前暫無安排生產排程！</p>`;
+                renderCart();
                 return;
             }
 
             let html = "";
             for (let product in data) {
-                let info = data[product];
-                let remain = (info.total || 0) - (info.sold || 0);
+                let p = data[product];
+                let remain = (p.total || 0) - (p.sold || 0);
                 if (remain < 0) remain = 0;
+                
+                let isSoldOut = remain <= 0;
+                let descText = p.desc ? p.desc : "新鮮天然手作，限量烘焙售完為止。";
 
                 html += `
-                    <div class="product-card">
-                        <img class="product-img" src="${info.img || 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=300&q=80'}" alt="${product}">
-                        <div class="product-body">
-                            <h3 class="product-name">${product}</h3>
-                            <p class="product-desc">${info.desc || '無內容物說明'}</p>
-                            <p class="product-stock-info">
-                                限量：${info.total} 件<br>
-                                剩餘：<span style="color:${remain === 0 ? 'red' : 'var(--primary-amber)'}; font-weight:700;">${remain}</span> 件
-                            </p>
-                            <div class="product-footer">
-                                <span class="product-price">${info.price || 0}</span>
-                                ${remain > 0 ? `
-                                    <div class="qty-controller">
-                                        <button class="qty-btn" onclick="changeQty('${product}', -1)">-</button>
-                                        <input class="qty-input" id="qty_${product}" value="0" readonly>
-                                        <button class="qty-btn" onclick="changeQty('${product}', 1)">+</button>
-                                    </div>
-                                ` : `<span style="color:red; font-size:13px; font-weight:500;">已售罄</span>`}
+                    <div class="product-card" style="${isSoldOut ? 'opacity: 0.65;' : ''}">
+                        <img class="product-img" src="${p.img || 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=300&q=80'}">
+                        <div class="product-info">
+                            <h3>${product}</h3>
+                            <p class="product-desc">${descText}</p>
+                            <div class="product-status">
+                                ${isSoldOut ? '<span style="color:red; font-weight:700;">[ 已售罄 😭 ]</span>' : `庫存剩餘：<span style="color:green; font-weight:700;">${remain}</span> 個`}
+                            </div>
+                            <div class="product-price-row">
+                                <span class="price">NT$ ${p.price || 0}</span>
+                                ${isSoldOut ? 
+                                    '<span style="color:#9c8e82; font-size:13px; font-weight:500;">補貨中</span>' : 
+                                    `<div class="qty-control">
+                                        <button class="qty-btn" onclick="updateQty('${product}', -1)">-</button>
+                                        <input class="qty-input" id="qty_${product}" type="text" value="0" readonly>
+                                        <button class="qty-btn" onclick="updateQty('${product}', 1)">+</button>
+                                    </div>`
+                                }
                             </div>
                         </div>
                     </div>
                 `;
             }
-            productsContainer.innerHTML = html;
+            document.getElementById("products").innerHTML = html;
+            renderCart();
         }
 
-        // 3. 處理加減鈕邏輯
-        window.changeQty = function(product, delta) {
-            let input = document.getElementById("qty_" + product);
-            let currentQty = parseInt(input.value) || 0;
-            let targetQty = currentQty + delta;
+        document.getElementById("dateSelect").addEventListener("change", (e) => {
+            let selectedOpt = e.target.options[e.target.selectedIndex];
+            let dbDate = selectedOpt.getAttribute("data-base");
+            baseDatabaseDate = dbDate;
+            fetchProductsByDate(dbDate);
+        });
 
-            let info = currentProductsRaw[product];
-            let remain = (info.total || 0) - (info.sold || 0);
+        window.updateQty = function(product, delta) {
+            let remain = currentProductsDataSnapshot[product].total - currentProductsDataSnapshot[product].sold;
+            let currentVal = cart[product] || 0;
+            let newVal = currentVal + delta;
 
-            if (targetQty < 0) targetQty = 0;
-            if (targetQty > remain) {
-                alert(`非常抱歉！庫存僅剩 ${remain} 個，無法再增加了。`);
-                targetQty = remain;
+            if (newVal < 0) newVal = 0;
+            if (newVal > remain) {
+                alert(`抱歉！${product} 生產剩餘庫存只剩 ${remain} 個囉！`);
+                return;
             }
 
-            input.value = targetQty;
-            if (targetQty > 0) {
-                cart[product] = targetQty;
-            } else {
+            if (newVal === 0) {
                 delete cart[product];
+            } else {
+                cart[product] = newVal;
             }
-            updateCartDisplay();
+
+            const inputNode = document.getElementById(`qty_${product}`);
+            if (inputNode) inputNode.value = newVal;
+
+            renderCart();
         }
 
-        // 4. 更新下方的「我的預購明細」與計算總金額
-        function updateCartDisplay() {
+        function renderCart() {
             const tbody = document.getElementById("cart-items-tbody");
-            let grandTotal = 0;
-
+            
             if (Object.keys(cart).length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #9c8e82;">請在上方增減選購數量項目</td></tr>`;
-                document.getElementById("grand-total-display").innerText = "NT$ 0";
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #9c8e82; padding: 20px 0;">尚未選擇任何商品項目</td></tr>`;
+                document.getElementById("grand-total-display").textContent = "NT$ 0";
                 return;
             }
 
             let html = "";
+            let grandTotal = 0;
+
             for (let product in cart) {
                 let qty = cart[product];
-                let price = currentProductsRaw[product]?.price || 0;
+                let price = currentProductsDataSnapshot[product].price || 0;
                 let subtotal = price * qty;
                 grandTotal += subtotal;
 
                 html += `
                     <tr>
                         <td><b>${product}</b></td>
-                        <td>NT$ ${price}</td>
-                        <td>${qty} 個</td>
-                        <td style="color:var(--accent-orange); font-weight:700;">NT$ ${subtotal}</td>
+                        <td style="text-align: center; font-weight: 500;">× ${qty}</td>
+                        <td style="text-align: right; color:var(--accent-orange); font-weight:700;">NT$ ${subtotal}</td>
                     </tr>
                 `;
             }
+
             tbody.innerHTML = html;
-            document.getElementById("grand-total-display").innerText = "NT$ " + grandTotal.toLocaleString();
+            document.getElementById("grand-total-display").textContent = `NT$ ${grandTotal.toLocaleString()}`;
         }
 
-        // 5. 送出訂單（利用交易安全扣庫存，並將數據寫入後台看得見的 orders）
         window.submitOrder = async function() {
             let name = document.getElementById("name").value.trim();
             let phone = document.getElementById("phone").value.trim();
-            let date = document.getElementById("dateSelect").value;
+            let date = document.getElementById("dateSelect").value; 
+            let time = document.getElementById("timeSelect").value;         
+            let location = document.getElementById("locationSelect").value; 
+            let note = document.getElementById("note").value.trim(); // ⭐ 核心新增：獲取備註內容
 
-            if (!name || !phone) {
-                alert("請填寫訂購人真實姓名與聯絡電話！");
+            if (!name || !phone || !date) {
+                alert("請填寫完整的『姓名』、『電話』與『取貨日期』！");
                 return;
             }
+
             if (Object.keys(cart).length === 0) {
-                alert("購物車內目前沒有任何品項，請先選購麵包。");
+                alert("請先挑選商品數量！");
                 return;
             }
 
-            // 使用 Transaction 確保多人在線扣減時，庫存資料百分之百正確
             try {
                 let isStockOk = true;
-                const productRef = ref(db, "products/" + date);
+                const dbProductRef = ref(db, "products/" + baseDatabaseDate);
 
-                await runTransaction(productRef, (currentProducts) => {
+                await runTransaction(dbProductRef, (currentProducts) => {
                     if (currentProducts) {
                         for (let p in cart) {
                             let requestedQty = cart[p];
                             let remain = currentProducts[p].total - currentProducts[p].sold;
                             if (requestedQty > remain) {
                                 isStockOk = false;
-                                return; // 中斷交易
+                                return; 
                             }
                         }
-                        // 如果庫存足夠，執行真實扣減（sold增加）
                         for (let p in cart) {
                             currentProducts[p].sold += cart[p];
                         }
@@ -347,30 +411,30 @@
                 });
 
                 if (!isStockOk) {
-                    alert("剛剛有其他顧客搶先一步下單，部分商品剩餘庫存不足，請重新調整數量！");
-                    loadProducts(date);
+                    alert("庫存發生變動，請重新調整數量！");
+                    fetchProductsByDate(baseDatabaseDate);
                     return;
                 }
 
-                // 寫入訂單節點，讓後台抓取條列
                 const orderRef = ref(db, "orders");
                 const newOrderRef = push(orderRef);
                 await set(newOrderRef, {
-                    name: name,
-                    phone: phone,
-                    date: date,
-                    items: cart
+                    name: name, phone: phone, date: date, time: time, location: location, 
+                    items: cart,
+                    note: note // ⭐ 核心新增：將備註存入資料庫
                 });
 
-                alert("🎉 恭喜您！預購訂單已成功送出，我們會為您保留麵包！");
+                alert(`🎉 預購成功！\n📅 取貨日期：${date}\n📍 地點：${location}\n🕒 時間：${time}`);
+                
                 document.getElementById("name").value = "";
                 document.getElementById("phone").value = "";
+                document.getElementById("note").value = ""; // 清空備註欄
                 cart = {};
-                loadProducts(date);
+                fetchProductsByDate(baseDatabaseDate);
 
             } catch (err) {
                 console.error(err);
-                alert("下單失敗，請稍後再試。");
+                alert("連線有誤，請再試一次。");
             }
         }
 
