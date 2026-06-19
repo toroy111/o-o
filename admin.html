@@ -63,9 +63,16 @@
 
         .date-group { margin-bottom: 20px; background: white; border: 1px solid var(--border-color); border-radius: 6px; padding: 15px 20px; }
         .date-group h4 { font-size: 15px; color: var(--primary-amber); border-bottom: 1px dashed var(--border-color); padding-bottom: 8px; margin-bottom: 10px; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 14px; border-bottom: 1px solid #fafafa; }
+        
+        /* 每一行麵包品項改用 flex 排版，讓右側對齊按鈕 */
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-size: 14px; border-bottom: 1px solid #fafafa; gap: 15px; }
         .item-row:last-child { border-bottom: none; }
-        .stock-badge { font-size: 12px; background: #faf8f5; padding: 3px 8px; border-radius: 4px; color: #7c6e62; }
+        .item-info { flex-grow: 1; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+        .stock-badge { font-size: 12px; background: #faf8f5; padding: 4px 10px; border-radius: 4px; color: #7c6e62; white-space: nowrap; }
+        
+        /* 🌟 單項刪除小按鈕樣式 */
+        .btn-delete-single { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .btn-delete-single:hover { background: #fca5a5; color: #b91c1c; }
 
         .admin-table { width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color); font-size: 14px; table-layout: fixed; }
         .admin-table th { background: #faf8f5; color: #7c6e62; font-weight: 500; padding: 16px 15px; text-align: left; border-bottom: 2px solid var(--border-color); }
@@ -97,7 +104,7 @@
 
         <div class="system-toolbar">
             <div class="toolbar-group" style="flex-grow: 1;">
-                <label><i class="fa-solid fa-file-invoice-dollar"></i> 營運數據 analysis 與備份</label>
+                <label><i class="fa-solid fa-file-invoice-dollar"></i> 營運數據分析與備份</label>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn-tool btn-refresh" onclick="initBackend()">
                         <i class="fa-solid fa-arrows-rotate"></i> 重新抓取資料
@@ -210,7 +217,6 @@
             await loadOrders();    
         }
 
-        // 核心壓縮技術：將大圖片等比例縮小、降低 K 數，達成 100% 成功秒傳
         window.handleFileSelect = function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -228,7 +234,6 @@
                 const img = new Image();
                 img.src = e.target.result;
                 img.onload = function() {
-                    // 設定網頁最佳最大寬度為 1024 像素，兼顧畫質與體積
                     const maxWidth = 1024;
                     let targetWidth = img.width;
                     let targetHeight = img.height;
@@ -244,7 +249,6 @@
                     const ctx = canvas.getContext("2d");
                     ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
-                    // 以 JPEG 格式與 0.82 的壓縮比將圖片瘦身 90%
                     canvas.toBlob(async function(blob) {
                         statusText.innerText = "⏳ 體積優化完成！正高速上傳圖床...";
                         
@@ -338,6 +342,29 @@
             }
         }
 
+        // 🌟 核心新增：獨立刪除單一麵包品項的功能
+        window.deleteSingleProduct = async function(date, productName) {
+            const confirmDelete = confirm(`確定要將 ${date} 的商品「${productName}」單獨下架刪除嗎？`);
+            if (!confirmDelete) return;
+
+            try {
+                // 直接指向該日期下的特定麵包名稱路徑並刪除
+                await remove(ref(db, `products/${date}/${productName}`));
+                
+                // 防護機制：如果該日期刪到最後已經沒有任何麵包了，就把日期節點也順便清掉，避免留下一行空的日期
+                const snapshot = await get(ref(db, `products/${date}`));
+                if (!snapshot.exists() || Object.keys(snapshot.val()).length === 0) {
+                    await remove(ref(db, `products/${date}`));
+                }
+
+                alert(`🗑️ 已成功刪除商品：${productName}`);
+                initBackend(); // 重新整理網頁資料
+            } catch (error) {
+                console.error(error);
+                alert("刪除失敗，請檢查網路連線後再試一次。");
+            }
+        }
+
         window.saveProduct = async function() {
             const date = document.getElementById("date").value;
             const product = document.getElementById("product").value.trim();
@@ -396,12 +423,18 @@
                     let price = prod.price || 0;
                     let desc = prod.desc ? ` <small style="color:#a39589;">(${prod.desc})</small>` : "";
 
+                    // 🌟 修改點：在每個品項的最尾端，新增單項刪除按鈕，並傳入對應的日期與名稱
                     html += `
                         <div class="item-row">
-                            <div><b>${product}</b> <span class="price-text" style="font-size:13px; margin-left:8px;">NT$ ${price}</span>${desc}</div>
-                            <div class="stock-badge">
-                                總產量: ${prod.total} 件 ｜ 已訂: <span style="color:var(--accent-orange); font-weight:700;">${prod.sold}</span> 件 ｜ 剩餘: <span style="color:${remain === 0 ? 'red' : 'green'}; font-weight:700;">${remain}</span> 件
+                            <div class="item-info">
+                                <div><b>${product}</b> <span class="price-text" style="font-size:13px; margin-left:8px;">NT$ ${price}</span>${desc}</div>
+                                <div class="stock-badge">
+                                    總產量: ${prod.total} 件 ｜ 已訂: <span style="color:var(--accent-orange); font-weight:700;">${prod.sold}</span> 件 ｜ 剩餘: <span style="color:${remain === 0 ? 'red' : 'green'}; font-weight:700;">${remain}</span> 件
+                                </div>
                             </div>
+                            <button class="btn-delete-single" onclick="deleteSingleProduct('${date}', '${product.replace(/'/g, "\\'")}')">
+                                <i class="fa-solid fa-trash-can"></i> 刪除單項
+                            </button>
                         </div>
                     `;
                 }
