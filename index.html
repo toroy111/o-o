@@ -90,16 +90,15 @@
         .product-info h3 { font-size: 14px; font-weight: 700; }
         @media (min-width: 480px) { .product-info h3 { font-size: 16px; } }
         
+       /* ✨ 修正後的商品備註描述：後台字數多少，前台就自動撐開多少空間 */
         .product-desc { 
-    font-size: 13px; 
-    color: #8a7c70; 
-    line-height: 1.4; 
-    height: 38px;       /* 👈 這裡卡死了固定高度 */
-    overflow: hidden; 
-    display: -webkit-box; 
-    -webkit-line-clamp: 2; /* 👈 這裡限制了最多只能顯示兩行 */
-    -webkit-box-orient: vertical; 
-}
+            font-size: 13px; 
+            color: #8a7c70; 
+            line-height: 1.5; 
+            margin-bottom: 8px;
+            word-wrap: break-word;       /* 防止一長串英數字或網址衝出邊框 */
+            white-space: pre-wrap;       /* ✨ 保留你在後台敲的「換行」與「空格」送出格式 */
+        }
         
         .product-status { font-size: 11px; color: #a39589; margin-top: 2px; }
         @media (min-width: 480px) { .product-status { font-size: 12px; margin-top: 4px; } }
